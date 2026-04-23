@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "andrawina-kuliner",
+      "name": "OnCall-kuliner",
       "dependencies": {
         "@floating-ui/react": "^0.27.18",
         "@hookform/resolvers": "^5.2.2",

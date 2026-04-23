@@ -7,13 +7,13 @@ import { Omset } from "@/app/dashboard/omset/column";
 import { formatDate } from "@/lib/format-date";
 
 const BRAND = {
-  name: "Andrawina Kuliner Indonesia",
+  name: "Manajemen OnCall Indonesia",
   tagline: "Jajanan Pasar Autentik Nusantara",
   address:
     "Jalan Cendrawasih 1 No.40, rt.01/06, Cipayung, Kec. Ciputat, Kota Tangerang Selatan, Banten 15411",
   phone: "+62 812-3456-7890",
-  email: "andrawinakuliner@gmail.com",
-  website: "www.andrawinakuliner.com",
+  email: "OnCallkuliner@gmail.com",
+  website: "www.OnCallkuliner.com",
 } as const;
 
 const LOGO_BASE64 =
@@ -212,7 +212,7 @@ function buildInvoiceHTML(omset: Omset): string {
 <div class="page">
   <header class="header">
     <div class="brand-logo">
-      <img src="${LOGO_BASE64}" alt="Andrawina Kuliner" style="height:48px;width:auto;display:block;" />
+      <img src="${LOGO_BASE64}" alt="Manajemen OnCall" style="height:48px;width:auto;display:block;" />
     </div>
     <div class="invoice-badge">
       <div class="invoice-title">INVOICE</div>

@@ -63,12 +63,12 @@ export default function LoginPage() {
         <div className="flex items-center gap-4 justify-start font-bold text-2xl text-shadow-sm">
           <Image
             src="/images/logo-fix.png"
-            alt="Andrawina Logo Fixed"
+            alt="OnCall Logo Fixed"
             width={50}
             height={50}
           />
           <p className="wrap-break-word leading-normal self-start text-3xl">
-            Andrawina Kuliner
+            Manajemen OnCall
           </p>
         </div>
         <div className="flex flex-1 items-center justify-center">
@@ -160,7 +160,7 @@ export default function LoginPage() {
       <div className="hidden bg-secondary lg:flex justify-center items-center p-6">
         <Image
           src="/images/logo-fix.png"
-          alt="Andrawina Logo Fixed"
+          alt="OnCall Logo Fixed"
           width={400}
           height={400}
           className="object-contain"

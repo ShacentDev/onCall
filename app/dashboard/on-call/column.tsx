@@ -1,21 +1,16 @@
 "use client";
 
-import { ColumnDef, Row } from "@tanstack/react-table";
-import { Eye, Pencil, Trash2, ArrowUpDown } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { ColumnDef } from "@tanstack/react-table";
+import { Eye, Trash2, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
-  DialogTrigger, DialogFooter, DialogClose
+  DialogTrigger, 
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { apiRequest } from "@/lib/api-client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { createOnCallSchema, CreateOnCallSchema } from "@/lib/zod";
 import { toast } from "sonner";
-import { DateTimePicker } from "@/components/time-picker";
 
 export const Columns = (): ColumnDef<OnCall>[] => [
   {
@@ -23,7 +18,7 @@ export const Columns = (): ColumnDef<OnCall>[] => [
     header: "Dokter",
   },
   {
-    accessorKey: "specialization ",
+    accessorKey: "specialization",
     header: "Spesialis",
   },
   {
@@ -45,7 +40,6 @@ export const Columns = (): ColumnDef<OnCall>[] => [
     cell: ({ row }) => (
       <div className="flex gap-2">
         <DetailDialog data={row.original} />
-        <EditDialog data={row.original} />
         <DeleteDialog id={row.original.id} />
       </div>
     ),
@@ -74,98 +68,6 @@ function DetailDialog({ data }: { data: OnCall }) {
           <p><b>Selesai:</b> {new Date(data.endTime).toLocaleString()}</p>
           <p><b>Catatan:</b> {data.notes || "-"}</p>
         </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function EditDialog({ data }: { data: OnCall }) {
-  const [open, setOpen] = useState(false);
-
-  const form = useForm<CreateOnCallSchema>({
-    resolver: zodResolver(createOnCallSchema),
-    defaultValues: {
-      ...data,
-      startTime: data.startTime.slice(0, 16),
-      endTime: data.endTime.slice(0, 16),
-    },
-  });
-
-  const onSubmit = async (values: CreateOnCallSchema) => {
-    const res = await apiRequest({
-      url: "/api/oncall",
-      method: "PATCH",
-      data: { id: data.id, ...values },
-      revalidate: "/api/oncall",
-    });
-
-    if (res) {
-      toast.success("Berhasil update");
-      setOpen(false);
-    }
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="icon" variant="outline">
-          <Pencil className="h-4 w-4" />
-        </Button>
-      </DialogTrigger>
-
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Edit OnCall</DialogTitle>
-        </DialogHeader>
-
-       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-
-          <Field form={form} name="doctorName" label="Dokter" />
-          <Field form={form} name="specialization" label="Spesialis" /> {/* FIX spasi */}
-          <Field form={form} name="room" label="Ruangan" />
-
-          {/* START TIME */}
-          <FormField
-            control={form.control}
-            name="startTime"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Mulai</FormLabel>
-                <FormControl>
-                  <DateTimePicker
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* END TIME */}
-          <FormField
-            control={form.control}
-            name="endTime"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Selesai</FormLabel>
-                <FormControl>
-                  <DateTimePicker
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <Field form={form} name="notes" label="Catatan" /> {/* FIX notes */}
-
-          <Button type="submit">Simpan</Button>
-        </form>
-      </Form>
       </DialogContent>
     </Dialog>
   );

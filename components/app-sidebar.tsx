@@ -25,11 +25,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <Link href="/dashboard" className="flex items-center gap-2">
                 <Image
                   src="/images/logo-fix.png"
-                  alt="Andrawina Logo Fixed"
+                  alt="OnCall Logo Fixed"
                   width={30}
                   height={30}
                 />
-                <h1 className="font-medium">Andrawina Kuliner</h1>
+                <h1 className="font-medium">Manajemen OnCall</h1>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

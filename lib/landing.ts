@@ -43,7 +43,7 @@ export const FAQ_ITEMS = [
   {
     question: "Apakah bisa memesan hanya produk yang spesifik?",
     answer:
-      "Tentu. Anda dapat memesan produk secara spesifik sesuai dengan kebutuhan acara Anda. Sebagai contoh, Anda dapat melakukan pemesanan 100 buah Risol Mayo dan 50 buah Bolu Kukus. Andrawina Kuliner siap melayani permintaan Anda dengan profesional dan menyesuaikan pesanan sesuai kebutuhan.",
+      "Tentu. Anda dapat memesan produk secara spesifik sesuai dengan kebutuhan acara Anda. Sebagai contoh, Anda dapat melakukan pemesanan 100 buah Risol Mayo dan 50 buah Bolu Kukus. Manajemen OnCall siap melayani permintaan Anda dengan profesional dan menyesuaikan pesanan sesuai kebutuhan.",
   },
 ];
 
@@ -233,7 +233,7 @@ export const TESTIMONIALS = [
     initial: "S",
   },
   {
-    text: "Kami percayakan kebutuhan snack seminar tahunan ke Andrawina. Profesional, responsif, dan produknya selalu fresh. Sangat direkomendasikan!",
+    text: "Kami percayakan kebutuhan snack seminar tahunan ke OnCall. Profesional, responsif, dan produknya selalu fresh. Sangat direkomendasikan!",
     name: "Budi Santoso",
     role: "Panitia Seminar, Universitas Terbuka",
     initial: "B",

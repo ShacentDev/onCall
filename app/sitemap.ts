@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 import prisma from "@/lib/prisma";
 
-const SITE_URL = process.env.WEBSITE_URL || "https://www.andrawinakuliner.com";
+const SITE_URL = process.env.WEBSITE_URL || "https://www.OnCallkuliner.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();

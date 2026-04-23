@@ -16,20 +16,20 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const SITE_URL = process.env.WEBSITE_URL || "https://www.andrawinakuliner.com";
-const SITE_NAME = "Andrawina Kuliner Indonesia";
+const SITE_URL = process.env.WEBSITE_URL || "https://www.OnCallkuliner.com";
+const SITE_NAME = "Manajemen OnCall Indonesia";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
 
   title: {
     default:
-      "Andrawina Kuliner Indonesia | Catering & Snack Box Tradisional Sejak 2017",
-    template: "%s | Andrawina Kuliner Indonesia",
+      "Manajemen OnCall Indonesia | Catering & Snack Box Tradisional Sejak 2017",
+    template: "%s | Manajemen OnCall Indonesia",
   },
 
   description:
-    "Andrawina Kuliner Indonesia telah beroperasi sejak 2017 sebagai penyedia layanan katering profesional yang menghadirkan beragam pilihan snack box, hidangan kuliner, dan jajanan khas Nusantara dengan cita rasa autentik. Berpengalaman melayani ratusan kebutuhan acara, mulai dari kegiatan korporat, pernikahan, hingga berbagai gathering eksklusif. Kami berkomitmen menghadirkan kualitas terbaik, layanan yang andal, serta pengalaman kuliner yang berkesan di setiap kesempatan. Tersedia layanan pengiriman untuk area Jabodetabek.",
+    "Manajemen OnCall Indonesia telah beroperasi sejak 2017 sebagai penyedia layanan katering profesional yang menghadirkan beragam pilihan snack box, hidangan kuliner, dan jajanan khas Nusantara dengan cita rasa autentik. Berpengalaman melayani ratusan kebutuhan acara, mulai dari kegiatan korporat, pernikahan, hingga berbagai gathering eksklusif. Kami berkomitmen menghadirkan kualitas terbaik, layanan yang andal, serta pengalaman kuliner yang berkesan di setiap kesempatan. Tersedia layanan pengiriman untuk area Jabodetabek.",
 
   keywords: [
     "catering Jakarta",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     "catering tradisional Indonesia",
     "snack box murah Jakarta",
     "catering gathering",
-    "Andrawina Kuliner",
+    "Manajemen OnCall",
     "catering hajatan",
     "nasi kotak murah",
     "catering profesional Jakarta",
@@ -54,9 +54,9 @@ export const metadata: Metadata = {
     "catering halal Jakarta",
   ],
 
-  authors: [{ name: "Andrawina Kuliner Indonesia", url: SITE_URL }],
-  creator: "Andrawina Kuliner Indonesia",
-  publisher: "Andrawina Kuliner Indonesia",
+  authors: [{ name: "Manajemen OnCall Indonesia", url: SITE_URL }],
+  creator: "Manajemen OnCall Indonesia",
+  publisher: "Manajemen OnCall Indonesia",
 
   alternates: {
     canonical: "/",
@@ -71,7 +71,7 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: SITE_NAME,
     title:
-      "Andrawina Kuliner Indonesia | Catering & Snack Box Tradisional Sejak 2017",
+      "Manajemen OnCall Indonesia | Catering & Snack Box Tradisional Sejak 2017",
     description:
       "Catering, snack box, dan nasi box tradisional dengan standar modern dan cita rasa autentik Nusantara. Melayani ratusan acara sejak 2017. Pesan untuk Jabodetabek.",
     images: [
@@ -79,7 +79,7 @@ export const metadata: Metadata = {
         url: "/images/og-image.jpg", // Buat gambar 1200x630px yang menarik
         width: 1200,
         height: 630,
-        alt: "Andrawina Kuliner Indonesia - Catering & Snack Box Tradisional",
+        alt: "Manajemen OnCall Indonesia - Catering & Snack Box Tradisional",
         type: "image/jpeg",
       },
     ],
@@ -88,11 +88,11 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title:
-      "Andrawina Kuliner Indonesia | Catering & Snack Box Tradisional Sejak 2017",
+      "Manajemen OnCall Indonesia | Catering & Snack Box Tradisional Sejak 2017",
     description:
       "Catering, snack box, dan nasi box tradisional dengan standar modern. Melayani ratusan acara sejak 2017 untuk Jabodetabek.",
     images: ["/images/og-image.jpg"],
-    creator: "@andrawinakuliner",
+    creator: "@OnCallkuliner",
   },
 
   icons: {
@@ -130,7 +130,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Andrawina Kuliner",
+    title: "Manajemen OnCall",
     startupImage: [
       {
         url: "/apple-splash-2048-2732.jpg",
@@ -218,13 +218,13 @@ export default function RootLayout({
       {
         "@type": ["FoodEstablishment", "LocalBusiness"],
         "@id": `${SITE_URL}/#business`,
-        name: "Andrawina Kuliner Indonesia",
-        alternateName: "Andrawina Kuliner",
+        name: "Manajemen OnCall Indonesia",
+        alternateName: "Manajemen OnCall",
         description:
           "Catering, snack box, dan nasi box tradisional Indonesia dengan cita rasa autentik dan standar produksi modern. Melayani berbagai acara sejak 2017.",
         url: SITE_URL,
         telephone: "+62-814-0071-5402",
-        email: "andrawinakulinerindonesia1@gmail.com",
+        email: "OnCallkulinerindonesia1@gmail.com",
         foundingDate: "2017",
         logo: {
           "@type": "ImageObject",
@@ -256,9 +256,9 @@ export default function RootLayout({
           { "@type": "City", name: "Tangerang Selatan" },
         ],
         sameAs: [
-          "https://www.instagram.com/andrawinakuliner",
-          "https://www.facebook.com/andrawinakuliner",
-          "https://www.tokopedia.com/andrawinakuliner",
+          "https://www.instagram.com/OnCallkuliner",
+          "https://www.facebook.com/OnCallkuliner",
+          "https://www.tokopedia.com/OnCallkuliner",
         ],
         openingHoursSpecification: [
           {

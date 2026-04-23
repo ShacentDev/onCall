@@ -5,7 +5,7 @@ export default function Loading() {
     <div className="flex items-center justify-center min-h-screen">
       <div className="flex flex-col justify-center items-center animate-bounce gap-2">
         <Image
-          src="/images/logo-fix.png"
+          src="/images/images.jpg"
           alt="Loading..."
           width={100}
           height={100}

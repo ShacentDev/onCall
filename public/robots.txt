@@ -17,7 +17,7 @@ Disallow: /_next/
 Disallow: /admin/
 
 # Sitemap
-Sitemap: https://www.andrawinakuliner.com/sitemap.xml
+Sitemap: https://www.OnCallkuliner.com/sitemap.xml
 
 # Crawl delay (opsional, bantu server tidak overload)
 Crawl-delay: 1

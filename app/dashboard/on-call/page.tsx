@@ -56,7 +56,7 @@ export default function OnCallPage() {
   if (!isValid) return null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
 
       <div>
         <h1 className="text-3xl font-bold">OnCall Dokter</h1>
@@ -96,16 +96,12 @@ export default function OnCallPage() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-
               <Input placeholder="Nama Dokter" {...form.register("doctorName")} />
               <Input placeholder="Spesialis" {...form.register("specialization")} />
               <Input placeholder="Ruangan" {...form.register("room")} />
-
               <Input type="datetime-local" {...form.register("startTime")} />
               <Input type="datetime-local" {...form.register("endTime")} />
-
               <Input placeholder="Catatan" {...form.register("note")} />
-
               <Button
                 type="submit"
                 disabled={!form.formState.isValid}
