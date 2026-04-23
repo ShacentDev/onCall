@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+
+# Izinkan semua halaman publik
+Allow: /blog/
+Allow: /produk/
+Allow: /tentang
+Allow: /paket
+
+# Blokir halaman yang tidak perlu diindeks
+Disallow: /dashboard/
+Disallow: /login/
+Disallow: /api/
+Disallow: /action/
+Disallow: /generated/
+Disallow: /_next/
+Disallow: /admin/
+
+# Sitemap
+Sitemap: https://www.andrawinakuliner.com/sitemap.xml
+
+# Crawl delay (opsional, bantu server tidak overload)
+Crawl-delay: 1
