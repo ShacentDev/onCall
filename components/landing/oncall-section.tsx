@@ -86,7 +86,7 @@ export function OnCallPublic() {
                   🏷️ {category}
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  Daftar dokter pada kategori ini
+                  Daftar petugas pada kategori ini
                 </p>
               </div>
 
