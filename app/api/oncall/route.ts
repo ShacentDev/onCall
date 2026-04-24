@@ -8,12 +8,57 @@ import {
 } from "@/lib/zod";
 import { requireAdmin } from "@/lib/session";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    await requireAdmin();
+    const { searchParams } = new URL(req.url);
+    const search = searchParams.get("search") || "";
 
     const onCalls = await prisma.personOnCall.findMany({
-      orderBy: { startTime: "desc" },
+      where: {
+        OR: [
+          {
+            person: {
+              name: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+          },
+          {
+            person: {
+              category: {
+                name: {
+                  contains: search,
+                  mode: "insensitive",
+                },
+              },
+            },
+          },
+          {
+            room: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        ],
+      },
+      orderBy: [
+        {
+          person: {
+            category: {
+              name: "asc", // 1. kategori dulu
+            },
+          },
+        },
+        {
+          person: {
+            name: "asc", // 2. nama dokter
+          },
+        },
+        {
+          startTime: "asc", // 3. jadwal
+        },
+      ],
       include: {
         person: {
           include: { category: true },
