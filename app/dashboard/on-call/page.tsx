@@ -109,8 +109,8 @@ const PersonOnCallPage = () => {
           <DataTable
             columns={personOnCallColumns}
             data={onCalls || []}
-            filterColumn="person.name"
-            filterPlaceholder="Filter nama..."
+            filterColumn="personCode"
+            filterPlaceholder="Filter menggunakan kode..."
           />
         </CardContent>
       </Card>
