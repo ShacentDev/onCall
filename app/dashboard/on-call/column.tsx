@@ -57,15 +57,22 @@ const formatDate = (iso: string) =>
   format(new Date(iso), "dd MMM yyyy, HH:mm", { locale: id });
 
 export const personOnCallColumns: ColumnDef<PersonOnCall>[] = [
+  // ✅ KODE
   {
-    accessorKey: "person.code",
+    id: "personCode",
     header: "Kode",
+    accessorFn: (row) => row.person?.code,
     cell: ({ row }) => (
-      <div className="font-mono font-medium">{row.original.person?.code}</div>
+      <div className="font-mono font-medium">
+        {row.original.person?.code}
+      </div>
     ),
   },
+
+  // ✅ NAMA
   {
-    accessorKey: "person.name",
+    id: "personName",
+    accessorFn: (row) => row.person?.name,
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -78,20 +85,30 @@ export const personOnCallColumns: ColumnDef<PersonOnCall>[] = [
     ),
     cell: ({ row }) => <div>{row.original.person?.name}</div>,
   },
+
+  // ✅ KATEGORI
   {
-    accessorKey: "person.category.name",
+    id: "categoryName",
+    accessorFn: (row) => row.person?.category?.name,
     header: "Kategori",
     cell: ({ row }) => (
-      <Badge variant="secondary">{row.original.person?.category?.name}</Badge>
+      <Badge variant="secondary">
+        {row.original.person?.category?.name}
+      </Badge>
     ),
   },
+
+  // ✅ RUANGAN
   {
     accessorKey: "room",
+    id: "room",
     header: "Ruangan",
-    cell: ({ row }) => <div>{row.getValue("room")}</div>,
   },
+
+  // ✅ START TIME
   {
     accessorKey: "startTime",
+    id: "startTime",
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -103,16 +120,25 @@ export const personOnCallColumns: ColumnDef<PersonOnCall>[] = [
       </Button>
     ),
     cell: ({ row }) => (
-      <div className="text-sm">{formatDate(row.getValue("startTime"))}</div>
+      <div className="text-sm">
+        {formatDate(row.getValue("startTime"))}
+      </div>
     ),
   },
+
+  // ✅ END TIME
   {
     accessorKey: "endTime",
+    id: "endTime",
     header: "Waktu Selesai",
     cell: ({ row }) => (
-      <div className="text-sm">{formatDate(row.getValue("endTime"))}</div>
+      <div className="text-sm">
+        {formatDate(row.getValue("endTime"))}
+      </div>
     ),
   },
+
+  // ✅ ACTIONS
   {
     id: "actions",
     header: "Aksi",

@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const SITE_URL = process.env.WEBSITE_URL || "https://www.OnCallkuliner.com";
+const SITE_URL = process.env.WEBSITE_URL || "https://www.OnCall.com";
 const SITE_NAME = "Manajemen OnCall Indonesia";
 
 export const metadata: Metadata = {

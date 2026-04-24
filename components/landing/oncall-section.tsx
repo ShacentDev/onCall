@@ -1,96 +1,107 @@
 "use client";
 
 import useSWR from "swr";
+import { useState, useRef } from "react";
 import { OnCallCard } from "../oncall-card";
-import { groupOnCalls } from "@/lib/on-call-utils";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Loader2 } from "lucide-react";
 
 export function OnCallPublic() {
-  const { data, isLoading } = useSWR("/api/oncall");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [isDebouncing, setIsDebouncing] = useState(false);
 
-  if (isLoading) {
-    return (
-      <div className="grid md:grid-cols-3 gap-4 px-4">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <Skeleton key={i} className="h-40 w-full rounded-xl" />
-        ))}
-      </div>
-    );
-  }
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { active, standby } = groupOnCalls(data || []);
+  const handleSearch = (value: string) => {
+    setSearch(value);
 
-  if (active.length === 0 && standby.length === 0) {
-    return (
-      <div className="text-center py-20 text-muted-foreground">
-        Tidak ada jadwal dokter
-      </div>
-    );
-  }
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    setIsDebouncing(true);
+
+    debounceRef.current = setTimeout(() => {
+      setDebouncedSearch(value);
+      setIsDebouncing(false);
+    }, 500);
+  };
+
+  const { data, isLoading } = useSWR(
+    `/api/oncall?search=${debouncedSearch}`
+  );
+
+  // ================= GROUP BY CATEGORY =================
+  const grouped = (data || []).reduce((acc: any, item: any) => {
+    const category = item.person?.category?.name || "Lainnya";
+
+    if (!acc[category]) acc[category] = [];
+    acc[category].push(item);
+
+    return acc;
+  }, {});
+
+  const isEmpty = !isLoading && (!data || data.length === 0);
 
   return (
-    <div className="min-h-[80vh] flex flex-col gap-12 px-4 md:px-6 lg:px-8">
+    <div className="flex flex-col gap-10">
 
-      {/* ================= ACTIVE ================= */}
-      <section className="space-y-10">
-        <div>
-          <h2 className="text-2xl font-bold text-green-600">
-            🟢 Sedang Bertugas
-          </h2>
-          <p className="text-muted-foreground text-sm">
-            Dokter yang sedang on-call saat ini
-          </p>
-        </div>
+      {/* 🔍 SEARCH (SELALU ADA) */}
+      <div className="max-w-md relative">
+        <Input
+          placeholder="Cari dokter / kategori / ruangan..."
+          value={search}
+          onChange={(e) => handleSearch(e.target.value)}
+          className="pr-8"
+        />
 
-        <div>
-          <h2 className="text-2xl font-bold text-green-600">
-            🟢 Sedang Bertugas
-          </h2>
-          <p className="text-muted-foreground text-sm">
-            Dokter yang sedang on-call saat ini
-          </p>
-        </div>
-
-        {active.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {active.map((item: any) => (
-              <OnCallCard key={item.id} data={item} />
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">
-            Tidak ada dokter yang sedang bertugas
-          </p>
+        {isDebouncing && (
+          <Loader2 className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
         )}
-      </section>
+      </div>
 
-      {/* ================= STANDBY ================= */}
-      <section className="space-y-4 border-t pt-6">
-        <div>
-          <h2 className="text-2xl font-bold text-yellow-500">
-            🟡 Standby
-          </h2>
-          <p className="text-muted-foreground text-sm">
-            Dokter yang akan bertugas
-          </p>
+      {isLoading && (
+        <div className="grid md:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-40 w-full rounded-xl" />
+          ))}
         </div>
+      )}
 
-        {standby.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {standby.map((item: any) => (
-              <OnCallCard key={item.id} data={item} />
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">
-            Tidak ada dokter standby
-          </p>
-        )}
-      </section>
+      {isEmpty && (
+        <div className="text-center py-20 text-muted-foreground">
+          Tidak ada hasil untuk <b>{search}</b>
+        </div>
+      )}
 
-      {/* 🔥 SPACER WAJIB (INI YANG BIKIN GA NABRAK) */}
+      {!isLoading && !isEmpty && (
+        <>
+          {Object.entries(grouped).map(([category, items]: any) => (
+            <section key={category} className="space-y-4">
+
+              <div>
+                <h2 className="text-xl font-bold">
+                  🏷️ {category}
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Daftar dokter pada kategori ini
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {items.map((item: any) => (
+                  <OnCallCard key={item.id} data={item} />
+                ))}
+              </div>
+
+            </section>
+          ))}
+        </>
+      )}
+
       <div className="h-20" />
-
     </div>
   );
 }
