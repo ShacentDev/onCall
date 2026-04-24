@@ -28,6 +28,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   onCalls OnCall[]
+  personOnCalls PersonOnCall[]
 
   @@map("user")
 }
@@ -97,4 +98,46 @@ model OnCall {
 
   @@index([createdById])
   @@map("oncall")
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  persons   Person[]
+
+  @@map("category")
+}
+
+model Person {
+  id         String   @id @default(cuid())
+  name       String
+  code       String   @unique
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  onCalls    PersonOnCall[]
+
+  @@index([categoryId])
+  @@map("person")
+}
+
+model PersonOnCall {
+  id             String   @id @default(cuid())
+  personId       String
+  person         Person   @relation(fields: [personId], references: [id], onDelete: Cascade)
+  room           String
+  startTime      DateTime
+  endTime        DateTime
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  createdById    String
+  createdBy      User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([personId])
+  @@index([createdById])
+  @@map("person_on_call")
 }

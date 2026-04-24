@@ -62,7 +62,7 @@ export default function LoginPage() {
       <div className="flex justify-center flex-col gap-4 p-6 md:p-10">
         <div className="flex items-center gap-4 justify-start font-bold text-2xl text-shadow-sm">
           <Image
-            src="/images/logo-fix.png"
+            src="/images/images.jpg"
             alt="OnCall Logo Fixed"
             width={50}
             height={50}
@@ -159,7 +159,7 @@ export default function LoginPage() {
 
       <div className="hidden bg-secondary lg:flex justify-center items-center p-6">
         <Image
-          src="/images/logo-fix.png"
+          src="/images/images.jpg"
           alt="OnCall Logo Fixed"
           width={400}
           height={400}

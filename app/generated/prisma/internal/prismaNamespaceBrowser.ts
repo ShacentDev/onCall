@@ -55,7 +55,10 @@ export const ModelName = {
   Session: 'Session',
   Account: 'Account',
   Verification: 'Verification',
-  OnCall: 'OnCall'
+  OnCall: 'OnCall',
+  Category: 'Category',
+  Person: 'Person',
+  PersonOnCall: 'PersonOnCall'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -150,6 +153,43 @@ export const OnCallScalarFieldEnum = {
 } as const
 
 export type OnCallScalarFieldEnum = (typeof OnCallScalarFieldEnum)[keyof typeof OnCallScalarFieldEnum]
+
+
+export const CategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
+
+
+export const PersonScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  code: 'code',
+  categoryId: 'categoryId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PersonScalarFieldEnum = (typeof PersonScalarFieldEnum)[keyof typeof PersonScalarFieldEnum]
+
+
+export const PersonOnCallScalarFieldEnum = {
+  id: 'id',
+  personId: 'personId',
+  room: 'room',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  createdById: 'createdById'
+} as const
+
+export type PersonOnCallScalarFieldEnum = (typeof PersonOnCallScalarFieldEnum)[keyof typeof PersonOnCallScalarFieldEnum]
 
 
 export const SortOrder = {

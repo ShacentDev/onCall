@@ -2,26 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { handleApiError } from "@/lib/errors";
 import {
-  createPersonOnCallSchema,
-  deletePersonOnCallSchema,
-  editPersonOnCallSchema,
+  createCategorySchema,
+  deleteCategorySchema,
+  editCategorySchema,
 } from "@/lib/zod";
 import { requireAdmin } from "@/lib/session";
+import { PrismaClientKnownRequestError } from "@/app/generated/prisma/internal/prismaNamespace";
 
 export async function GET() {
   try {
     await requireAdmin();
 
-    const onCalls = await prisma.personOnCall.findMany({
-      orderBy: { startTime: "desc" },
-      include: {
-        person: {
-          include: { category: true },
-        },
-      },
+    const categories = await prisma.category.findMany({
+      orderBy: { name: "asc" },
     });
 
-    return NextResponse.json(onCalls);
+    return NextResponse.json(categories);
   } catch (error) {
     return handleApiError(error);
   }
@@ -32,9 +28,8 @@ export async function POST(req: NextRequest) {
     await requireAdmin();
 
     const body = await req.json();
-    const session = await requireAdmin();
 
-    const result = createPersonOnCallSchema.safeParse(body);
+    const result = createCategorySchema.safeParse(body);
     if (!result.success) {
       return NextResponse.json(
         { message: result.error.issues[0].message },
@@ -42,21 +37,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await prisma.personOnCall.create({
+    await prisma.category.create({
       data: {
-        personId: result.data.personId,
-        room: result.data.room,
-        startTime: new Date(result.data.startTime),
-        endTime: new Date(result.data.endTime),
-        notes: result.data.notes ?? null,
-        createdById: session.user.id,
+        name: result.data.name,
       },
     });
 
-    return NextResponse.json({
-      message: "Jadwal on call berhasil ditambahkan.",
-    });
+    return NextResponse.json({ message: "Kategori berhasil ditambahkan." });
   } catch (error) {
+    if (
+      error instanceof PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      return NextResponse.json(
+        { message: "Lokasi dengan nama yang sama sudah ada." },
+        { status: 400 },
+      );
+    }
     return handleApiError(error);
   }
 }
@@ -64,10 +61,9 @@ export async function POST(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   try {
     await requireAdmin();
-
     const body = await req.json();
 
-    const result = editPersonOnCallSchema.safeParse(body);
+    const result = editCategorySchema.safeParse(body);
     if (!result.success) {
       return NextResponse.json(
         { message: result.error.issues[0].message },
@@ -75,18 +71,14 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    await prisma.personOnCall.update({
-      where: { id: result.data.id },
-      data: {
-        personId: result.data.personId,
-        room: result.data.room,
-        startTime: new Date(result.data.startTime),
-        endTime: new Date(result.data.endTime),
-        notes: result.data.notes ?? null,
+    await prisma.category.update({
+      where: {
+        id: result.data.id,
       },
+      data: { name: result.data.name },
     });
 
-    return NextResponse.json({ message: "Jadwal on call diperbarui." });
+    return NextResponse.json({ message: "Kategori diperbarui." });
   } catch (error) {
     return handleApiError(error);
   }
@@ -95,10 +87,9 @@ export async function PATCH(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     await requireAdmin();
-
     const body = await req.json();
 
-    const result = deletePersonOnCallSchema.safeParse(body);
+    const result = deleteCategorySchema.safeParse(body);
     if (!result.success) {
       return NextResponse.json(
         { message: result.error.issues[0].message },
@@ -106,11 +97,11 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    await prisma.personOnCall.delete({
+    await prisma.category.delete({
       where: { id: result.data.id },
     });
 
-    return NextResponse.json({ message: "Jadwal on call dihapus." });
+    return NextResponse.json({ message: "Kategori dihapus." });
   } catch (error) {
     return handleApiError(error);
   }

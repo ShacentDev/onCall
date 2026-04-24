@@ -66,3 +66,18 @@ export type Verification = Prisma.VerificationModel
  * 
  */
 export type OnCall = Prisma.OnCallModel
+/**
+ * Model Category
+ * 
+ */
+export type Category = Prisma.CategoryModel
+/**
+ * Model Person
+ * 
+ */
+export type Person = Prisma.PersonModel
+/**
+ * Model PersonOnCall
+ * 
+ */
+export type PersonOnCall = Prisma.PersonOnCallModel

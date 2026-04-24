@@ -233,6 +233,7 @@ export type UserWhereInput = {
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
   onCalls?: Prisma.OnCallListRelationFilter
+  personOnCalls?: Prisma.PersonOnCallListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -250,6 +251,7 @@ export type UserOrderByWithRelationInput = {
   accounts?: Prisma.AccountOrderByRelationAggregateInput
   sessions?: Prisma.SessionOrderByRelationAggregateInput
   onCalls?: Prisma.OnCallOrderByRelationAggregateInput
+  personOnCalls?: Prisma.PersonOnCallOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -270,6 +272,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
   onCalls?: Prisma.OnCallListRelationFilter
+  personOnCalls?: Prisma.PersonOnCallListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -321,6 +324,7 @@ export type UserCreateInput = {
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   onCalls?: Prisma.OnCallCreateNestedManyWithoutCreatedByInput
+  personOnCalls?: Prisma.PersonOnCallCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -338,6 +342,7 @@ export type UserUncheckedCreateInput = {
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   onCalls?: Prisma.OnCallUncheckedCreateNestedManyWithoutCreatedByInput
+  personOnCalls?: Prisma.PersonOnCallUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUpdateInput = {
@@ -355,6 +360,7 @@ export type UserUpdateInput = {
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   onCalls?: Prisma.OnCallUpdateManyWithoutCreatedByNestedInput
+  personOnCalls?: Prisma.PersonOnCallUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -372,6 +378,7 @@ export type UserUncheckedUpdateInput = {
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   onCalls?: Prisma.OnCallUncheckedUpdateManyWithoutCreatedByNestedInput
+  personOnCalls?: Prisma.PersonOnCallUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -529,6 +536,20 @@ export type UserUpdateOneRequiredWithoutOnCallsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutOnCallsInput, Prisma.UserUpdateWithoutOnCallsInput>, Prisma.UserUncheckedUpdateWithoutOnCallsInput>
 }
 
+export type UserCreateNestedOneWithoutPersonOnCallsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPersonOnCallsInput, Prisma.UserUncheckedCreateWithoutPersonOnCallsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPersonOnCallsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutPersonOnCallsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPersonOnCallsInput, Prisma.UserUncheckedCreateWithoutPersonOnCallsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPersonOnCallsInput
+  upsert?: Prisma.UserUpsertWithoutPersonOnCallsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPersonOnCallsInput, Prisma.UserUpdateWithoutPersonOnCallsInput>, Prisma.UserUncheckedUpdateWithoutPersonOnCallsInput>
+}
+
 export type UserCreateWithoutSessionsInput = {
   id: string
   name: string
@@ -543,6 +564,7 @@ export type UserCreateWithoutSessionsInput = {
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   onCalls?: Prisma.OnCallCreateNestedManyWithoutCreatedByInput
+  personOnCalls?: Prisma.PersonOnCallCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -559,6 +581,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   onCalls?: Prisma.OnCallUncheckedCreateNestedManyWithoutCreatedByInput
+  personOnCalls?: Prisma.PersonOnCallUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -591,6 +614,7 @@ export type UserUpdateWithoutSessionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   onCalls?: Prisma.OnCallUpdateManyWithoutCreatedByNestedInput
+  personOnCalls?: Prisma.PersonOnCallUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -607,6 +631,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   onCalls?: Prisma.OnCallUncheckedUpdateManyWithoutCreatedByNestedInput
+  personOnCalls?: Prisma.PersonOnCallUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserCreateWithoutAccountsInput = {
@@ -623,6 +648,7 @@ export type UserCreateWithoutAccountsInput = {
   updatedAt?: Date | string
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   onCalls?: Prisma.OnCallCreateNestedManyWithoutCreatedByInput
+  personOnCalls?: Prisma.PersonOnCallCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -639,6 +665,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   updatedAt?: Date | string
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   onCalls?: Prisma.OnCallUncheckedCreateNestedManyWithoutCreatedByInput
+  personOnCalls?: Prisma.PersonOnCallUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -671,6 +698,7 @@ export type UserUpdateWithoutAccountsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   onCalls?: Prisma.OnCallUpdateManyWithoutCreatedByNestedInput
+  personOnCalls?: Prisma.PersonOnCallUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -687,6 +715,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   onCalls?: Prisma.OnCallUncheckedUpdateManyWithoutCreatedByNestedInput
+  personOnCalls?: Prisma.PersonOnCallUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserCreateWithoutOnCallsInput = {
@@ -703,6 +732,7 @@ export type UserCreateWithoutOnCallsInput = {
   updatedAt?: Date | string
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  personOnCalls?: Prisma.PersonOnCallCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUncheckedCreateWithoutOnCallsInput = {
@@ -719,6 +749,7 @@ export type UserUncheckedCreateWithoutOnCallsInput = {
   updatedAt?: Date | string
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  personOnCalls?: Prisma.PersonOnCallUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserCreateOrConnectWithoutOnCallsInput = {
@@ -751,6 +782,7 @@ export type UserUpdateWithoutOnCallsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  personOnCalls?: Prisma.PersonOnCallUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOnCallsInput = {
@@ -767,6 +799,91 @@ export type UserUncheckedUpdateWithoutOnCallsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  personOnCalls?: Prisma.PersonOnCallUncheckedUpdateManyWithoutCreatedByNestedInput
+}
+
+export type UserCreateWithoutPersonOnCallsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: string | null
+  banned?: boolean | null
+  banReason?: string | null
+  banExpires?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  onCalls?: Prisma.OnCallCreateNestedManyWithoutCreatedByInput
+}
+
+export type UserUncheckedCreateWithoutPersonOnCallsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: string | null
+  banned?: boolean | null
+  banReason?: string | null
+  banExpires?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  onCalls?: Prisma.OnCallUncheckedCreateNestedManyWithoutCreatedByInput
+}
+
+export type UserCreateOrConnectWithoutPersonOnCallsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPersonOnCallsInput, Prisma.UserUncheckedCreateWithoutPersonOnCallsInput>
+}
+
+export type UserUpsertWithoutPersonOnCallsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPersonOnCallsInput, Prisma.UserUncheckedUpdateWithoutPersonOnCallsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPersonOnCallsInput, Prisma.UserUncheckedCreateWithoutPersonOnCallsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPersonOnCallsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPersonOnCallsInput, Prisma.UserUncheckedUpdateWithoutPersonOnCallsInput>
+}
+
+export type UserUpdateWithoutPersonOnCallsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  onCalls?: Prisma.OnCallUpdateManyWithoutCreatedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPersonOnCallsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  onCalls?: Prisma.OnCallUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 
@@ -778,12 +895,14 @@ export type UserCountOutputType = {
   accounts: number
   sessions: number
   onCalls: number
+  personOnCalls: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accounts?: boolean | UserCountOutputTypeCountAccountsArgs
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   onCalls?: boolean | UserCountOutputTypeCountOnCallsArgs
+  personOnCalls?: boolean | UserCountOutputTypeCountPersonOnCallsArgs
 }
 
 /**
@@ -817,6 +936,13 @@ export type UserCountOutputTypeCountOnCallsArgs<ExtArgs extends runtime.Types.Ex
   where?: Prisma.OnCallWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPersonOnCallsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PersonOnCallWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -833,6 +959,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   onCalls?: boolean | Prisma.User$onCallsArgs<ExtArgs>
+  personOnCalls?: boolean | Prisma.User$personOnCallsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -883,6 +1010,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   onCalls?: boolean | Prisma.User$onCallsArgs<ExtArgs>
+  personOnCalls?: boolean | Prisma.User$personOnCallsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -894,6 +1022,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     accounts: Prisma.$AccountPayload<ExtArgs>[]
     sessions: Prisma.$SessionPayload<ExtArgs>[]
     onCalls: Prisma.$OnCallPayload<ExtArgs>[]
+    personOnCalls: Prisma.$PersonOnCallPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1304,6 +1433,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   accounts<T extends Prisma.User$accountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   onCalls<T extends Prisma.User$onCallsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$onCallsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OnCallPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  personOnCalls<T extends Prisma.User$personOnCallsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$personOnCallsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PersonOnCallPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1806,6 +1936,30 @@ export type User$onCallsArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   distinct?: Prisma.OnCallScalarFieldEnum | Prisma.OnCallScalarFieldEnum[]
+}
+
+/**
+ * User.personOnCalls
+ */
+export type User$personOnCallsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PersonOnCall
+   */
+  select?: Prisma.PersonOnCallSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PersonOnCall
+   */
+  omit?: Prisma.PersonOnCallOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PersonOnCallInclude<ExtArgs> | null
+  where?: Prisma.PersonOnCallWhereInput
+  orderBy?: Prisma.PersonOnCallOrderByWithRelationInput | Prisma.PersonOnCallOrderByWithRelationInput[]
+  cursor?: Prisma.PersonOnCallWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PersonOnCallScalarFieldEnum | Prisma.PersonOnCallScalarFieldEnum[]
 }
 
 /**

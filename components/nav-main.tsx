@@ -51,6 +51,16 @@ const sidebarData: Record<string, MenuItem[]> = {
   admin: [
     { name: "Dashboard", url: "/dashboard", icon: "PieChart" },
     {
+      name: "Manajemen Kategori",
+      url: "/dashboard/kategori",
+      icon: "Tags",
+    },
+    {
+      name: "Manajemen Orang",
+      url: "/dashboard/orang",
+      icon: "Users",
+    },
+    {
       name: "Manajemen OnCall",
       url: "/dashboard/on-call",
       icon: "NotebookPen",
