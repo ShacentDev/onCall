@@ -23,11 +23,17 @@ export default function PublicLayout({
 }) {
   return (
     <div
-      className={`${cormorant.variable} ${dmSans.variable} bg-[#FEFCF9] text-stone-900 overflow-x-hidden`}
+      className={`${cormorant.variable} ${dmSans.variable} text-stone-900`}
       style={{ fontFamily: "var(--font-dm-sans), sans-serif" }}
     >
       <Navbar />
-      <main>{children}</main>
+
+      {/* 🔥 FIX FINAL: kasih offset + container SEKALI doang */}
+      <main className="pt-24">
+        <div className="max-w-8xl mx-auto py-4 px-4 md:px-2 lg:px-2">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }
