@@ -54,7 +54,7 @@ type PersonOnCall = {
 };
 
 const formatDate = (iso: string) =>
-  format(new Date(iso), "dd MMM yyyy, HH:mm", { locale: id });
+  format(new Date(iso), "dd MMM yyyy", { locale: id });
 
 export const personOnCallColumns: ColumnDef<PersonOnCall>[] = [
   // ✅ KODE
@@ -63,9 +63,7 @@ export const personOnCallColumns: ColumnDef<PersonOnCall>[] = [
     header: "Kode",
     accessorFn: (row) => row.person?.code,
     cell: ({ row }) => (
-      <div className="font-mono font-medium">
-        {row.original.person?.code}
-      </div>
+      <div className="font-mono font-medium">{row.original.person?.code}</div>
     ),
   },
 
@@ -92,9 +90,7 @@ export const personOnCallColumns: ColumnDef<PersonOnCall>[] = [
     accessorFn: (row) => row.person?.category?.name,
     header: "Kategori",
     cell: ({ row }) => (
-      <Badge variant="secondary">
-        {row.original.person?.category?.name}
-      </Badge>
+      <Badge variant="secondary">{row.original.person?.category?.name}</Badge>
     ),
   },
 
@@ -115,26 +111,12 @@ export const personOnCallColumns: ColumnDef<PersonOnCall>[] = [
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         className="-ml-4 hover:bg-transparent"
       >
-        Waktu Mulai
+        Tanggal Praktek
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
     cell: ({ row }) => (
-      <div className="text-sm">
-        {formatDate(row.getValue("startTime"))}
-      </div>
-    ),
-  },
-
-  // ✅ END TIME
-  {
-    accessorKey: "endTime",
-    id: "endTime",
-    header: "Waktu Selesai",
-    cell: ({ row }) => (
-      <div className="text-sm">
-        {formatDate(row.getValue("endTime"))}
-      </div>
+      <div className="text-sm">{formatDate(row.getValue("startTime"))}</div>
     ),
   },
 
@@ -192,14 +174,10 @@ function ViewPersonOnCallDialog({ onCall }: { onCall: PersonOnCall }) {
           <Separator />
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-xs text-muted-foreground mb-1">Waktu Mulai</p>
-              <p className="text-sm">{formatDate(onCall.startTime)}</p>
-            </div>
-            <div>
               <p className="text-xs text-muted-foreground mb-1">
-                Waktu Selesai
+                Tanggal Praktek
               </p>
-              <p className="text-sm">{formatDate(onCall.endTime)}</p>
+              <p className="text-sm">{formatDate(onCall.startTime)}</p>
             </div>
           </div>
           {onCall.notes && (
@@ -325,7 +303,7 @@ function EditPersonOnCallDialog({ onCall }: { onCall: PersonOnCall }) {
             name="startTime"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Waktu Mulai</FieldLabel>
+                <FieldLabel>Tanggal Praktek</FieldLabel>
                 <DateTimePicker
                   value={field.value}
                   onChange={field.onChange}

@@ -4,7 +4,7 @@ import { DataTable } from "@/components/data-table";
 import { personOnCallColumns } from "./column";
 import { useSession } from "@/lib/client-session";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { createPersonOnCallSchema, CreatePersonOnCallSchema } from "@/lib/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,7 +12,7 @@ import { apiRequest } from "@/lib/api-client";
 import { toast } from "sonner";
 import Loading from "@/components/loading";
 import { Controller, useForm } from "react-hook-form";
-import { CalendarClock, Plus } from "lucide-react";
+import { CalendarClock, Plus, FileDown, FileUp } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -32,6 +32,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { DateTimePicker } from "@/components/time-picker";
+import { ImportOnCallDialog } from "@/components/import-oncall";
 
 type Person = {
   id: string;
@@ -40,10 +41,30 @@ type Person = {
   category: { name: string };
 };
 
+type ImportOnCallResult = {
+  toCreate: {
+    personId: string | null;
+    personCode: string;
+    specialization: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+  }[];
+  duplicates: string[];
+  newCategories: string[];
+  newPersons: { code: string; categoryName: string }[];
+  totalRows: number;
+};
+
 const PersonOnCallPage = () => {
   const { user, isLoading } = useSession();
   const router = useRouter();
   const isUserValid = user?.role === "admin" && !isLoading;
+
+  const [importResult, setImportResult] = useState<ImportOnCallResult | null>(
+    null,
+  );
+  const [isImportError, setIsImportError] = useState(false);
 
   const { data: onCalls, isLoading: isLoadingOnCalls } = useSWR(
     isUserValid ? "/api/oncall" : null,
@@ -76,6 +97,58 @@ const PersonOnCallPage = () => {
     }
   };
 
+  const downloadExcel = async () => {
+    const res = await fetch("/api/oncall/excel");
+    if (!res.ok) {
+      toast.error("Gagal mengunduh template.");
+      return;
+    }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "template-oncall.xlsx";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsImportError(false);
+    setImportResult(null);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await apiRequest({
+      url: "/api/oncall/excel",
+      method: "POST",
+      data: formData,
+    });
+
+    if (res && typeof res === "string") {
+      setIsImportError(true);
+    } else {
+      setImportResult(res as ImportOnCallResult | null);
+    }
+
+    e.target.value = "";
+  };
+
+  const applyImport = async () => {
+    const res = await apiRequest({
+      url: "/api/oncall/excel/apply",
+      method: "POST",
+      data: { toCreate: importResult?.toCreate },
+      revalidate: "/api/oncall",
+    });
+    if (res && typeof res !== "string") {
+      setImportResult(null);
+      setIsImportError(false);
+    }
+  };
+
   useEffect(() => {
     if (!isUserValid && !isLoading && user) {
       toast.error("Akses ditolak. Hanya untuk Admin.");
@@ -98,6 +171,7 @@ const PersonOnCallPage = () => {
         </p>
       </div>
       <Separator />
+
       <Card>
         <CardHeader>
           <CardTitle>Daftar Jadwal On Call</CardTitle>
@@ -112,6 +186,57 @@ const PersonOnCallPage = () => {
             filterColumn="personCode"
             filterPlaceholder="Filter menggunakan kode..."
           />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileUp className="h-5 w-5" />
+            Import / Export Jadwal On Call
+          </CardTitle>
+          <CardDescription>
+            Gunakan template Excel untuk mengimpor jadwal on call secara massal.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button variant="outline" onClick={downloadExcel}>
+            <FileDown className="h-4 w-4 mr-2" />
+            Download Template Excel
+          </Button>
+
+          <div>
+            <Input
+              type="file"
+              accept=".xlsx, .xls"
+              onChange={handleUpload}
+              className="cursor-pointer"
+            />
+          </div>
+
+          {importResult && (
+            <ImportOnCallDialog
+              importResult={importResult}
+              applyChanges={applyImport}
+              isImportError={isImportError}
+            />
+          )}
+
+          <div className="space-y-1">
+            <p className="text-red-500 font-semibold text-sm">
+              **Jangan mengubah header atau formatting pada template Excel.
+            </p>
+            <p className="text-red-500 font-semibold text-sm">
+              **Kolom tanggal harus dalam format dd-mm-yyyy atau serial Excel.
+            </p>
+            <p className="text-red-500 font-semibold text-sm">
+              **Kode person harus sesuai dengan data yang terdaftar di sistem.
+            </p>
+            <p className="text-yellow-500 font-semibold text-sm">
+              **Entri yang sudah ada (kode person + tanggal sama) akan dilewati
+              secara otomatis.
+            </p>
+          </div>
         </CardContent>
       </Card>
 
