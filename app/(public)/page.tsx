@@ -1,11 +1,7 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import useSWRInfinite from "swr/infinite";
-import { useSession } from "@/lib/client-session";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import Loading from "@/components/loading";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -76,21 +72,20 @@ function buildDayGrid(weekStart: string, entries: PersonOnCall[]) {
       start.getDate() + i,
     );
     const dayStr = toLocalDateStr(day.toISOString());
-
     const dayEntries = entries.filter(
       (oc) => toLocalDateStr(oc.startTime) === dayStr,
     );
-
     const byCategory = dayEntries.reduce((acc, oc) => {
       const cat = oc.person.category.name;
       if (!acc[cat]) acc[cat] = [];
       acc[cat].push(oc);
       return acc;
     }, {} as Record<string, PersonOnCall[]>);
-
     return { day, dayStr, byCategory, total: dayEntries.length };
   });
 }
+
+const DAY_SHORT = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
 
 function WeekGrid({ week, search }: { week: WeekResponse; search: string }) {
   const days = buildDayGrid(week.weekStart, week.data);
@@ -109,15 +104,12 @@ function WeekGrid({ week, search }: { week: WeekResponse; search: string }) {
           ({week.data.length} jadwal)
         </span>
       </div>
-
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
         {days.map(({ day, dayStr, byCategory, total }, i) => {
           const isToday = dayStr === today;
           const categories = Object.entries(byCategory).sort(([a], [b]) =>
             a.localeCompare(b),
           );
-          const DAY_SHORT = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
-
           return (
             <div
               key={dayStr}
@@ -150,7 +142,6 @@ function WeekGrid({ week, search }: { week: WeekResponse; search: string }) {
                   </span>
                 )}
               </div>
-
               <div className="flex flex-col gap-1.5 p-2 flex-1 min-h-[80px]">
                 {categories.length === 0 ? (
                   <p className="text-[11px] text-muted-foreground text-center py-3">
@@ -190,10 +181,6 @@ function WeekGrid({ week, search }: { week: WeekResponse; search: string }) {
 }
 
 export default function OnCallViewPage() {
-  const { user, isLoading } = useSession();
-  const router = useRouter();
-  const isUserValid = user && !isLoading;
-
   const [startOffset, setStartOffset] = useState(0);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -204,51 +191,20 @@ export default function OnCallViewPage() {
   }, [search]);
 
   const getKey = useCallback(
-    (pageIndex: number, prev: WeekResponse | null) => {
-      if (!isUserValid) return null;
+    (pageIndex: number) => {
       const offset = startOffset - pageIndex;
       const params = new URLSearchParams({ weekOffset: String(offset) });
       if (debouncedSearch) params.set("search", debouncedSearch);
       return `/api/oncall?${params.toString()}`;
     },
-    [isUserValid, startOffset, debouncedSearch],
+    [startOffset, debouncedSearch],
   );
 
-  const {
-    data,
-    size,
-    setSize,
-    isValidating,
-    isLoading: isLoadingData,
-  } = useSWRInfinite<WeekResponse>(getKey, { revalidateFirstPage: false });
+  const { data, size, setSize, isValidating, isLoading } =
+    useSWRInfinite<WeekResponse>(getKey, { revalidateFirstPage: false });
 
   const isLoadingMore =
-    isLoadingData ||
-    (size > 0 && data && typeof data[size - 1] === "undefined");
-
-  useEffect(() => {
-    if (!isUserValid && !isLoading && user) {
-      toast.error("Akses ditolak.");
-      router.replace("/dashboard");
-    }
-  }, [isUserValid, isLoading, user, router]);
-
-  if (isLoading) return <Loading />;
-  if (!isUserValid) return null;
-
-  const handlePrev = () => {
-    setStartOffset((o) => o - 1);
-  };
-
-  const handleNext = () => {
-    if (startOffset < 0) {
-      setStartOffset((o) => o + 1);
-    } else {
-      setStartOffset((o) => o + 1);
-    }
-  };
-
-  const handleReset = () => setStartOffset(0);
+    isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
 
   return (
     <div className="space-y-6 pb-10">
@@ -266,24 +222,31 @@ export default function OnCallViewPage() {
 
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
         <div className="flex items-center gap-2 flex-wrap">
-          <Button variant="outline" size="icon" onClick={handlePrev}>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setStartOffset((o) => o - 1)}
+          >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <Button variant="outline" size="icon" onClick={handleNext}>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setStartOffset((o) => o + 1)}
+          >
             <ChevronRight className="h-4 w-4" />
           </Button>
           {startOffset !== 0 && (
             <Button
               variant="ghost"
               size="sm"
-              onClick={handleReset}
+              onClick={() => setStartOffset(0)}
               className="text-xs text-muted-foreground"
             >
               Kembali ke minggu ini
             </Button>
           )}
         </div>
-
         <div className="relative w-full sm:w-64">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -295,7 +258,7 @@ export default function OnCallViewPage() {
         </div>
       </div>
 
-      {isLoadingData && !data ? (
+      {isLoading && !data ? (
         <div className="flex justify-center py-20">
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
@@ -308,7 +271,6 @@ export default function OnCallViewPage() {
               search={debouncedSearch}
             />
           ))}
-
           <div className="flex justify-center">
             <Button
               variant="outline"
