@@ -38,11 +38,8 @@ export default function DashboardPage() {
             Selamat datang kembali,{" "}
             <span className="font-medium text-slate-700">{user.name}</span>.
           </p>
-          
         </div>
       </div>
-      <Separator />
-       <OnCallPublic />
-      </div>
+    </div>
   );
 }

@@ -7,66 +7,83 @@ import {
   editPersonOnCallSchema,
 } from "@/lib/zod";
 import { requireAdmin } from "@/lib/session";
+import {
+  startOfWeek,
+  endOfWeek,
+  addWeeks,
+  startOfDay,
+  endOfDay,
+} from "date-fns";
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("search") || "";
+    const weekOffsetParam = searchParams.get("weekOffset");
+
+    if (weekOffsetParam === null) {
+      const onCalls = await prisma.personOnCall.findMany({
+        where: {
+          OR: [
+            { person: { name: { contains: search, mode: "insensitive" } } },
+            { person: { code: { contains: search, mode: "insensitive" } } },
+            {
+              person: {
+                category: { name: { contains: search, mode: "insensitive" } },
+              },
+            },
+            { room: { contains: search, mode: "insensitive" } },
+          ],
+        },
+        orderBy: [
+          { person: { category: { name: "asc" } } },
+          { person: { name: "asc" } },
+          { startTime: "asc" },
+        ],
+        include: {
+          person: { include: { category: true } },
+        },
+      });
+
+      return NextResponse.json(onCalls);
+    }
+
+    const weekOffset = parseInt(weekOffsetParam);
+    const baseDate = addWeeks(new Date(), weekOffset);
+    const weekStart = startOfDay(startOfWeek(baseDate, { weekStartsOn: 1 }));
+    const weekEnd = endOfDay(endOfWeek(baseDate, { weekStartsOn: 1 }));
 
     const onCalls = await prisma.personOnCall.findMany({
       where: {
-        OR: [
-          {
-            person: {
-              name: {
-                contains: search,
-                mode: "insensitive",
+        startTime: { gte: weekStart, lte: weekEnd },
+        ...(search && {
+          OR: [
+            { person: { name: { contains: search, mode: "insensitive" } } },
+            { person: { code: { contains: search, mode: "insensitive" } } },
+            {
+              person: {
+                category: { name: { contains: search, mode: "insensitive" } },
               },
             },
-          },
-          {
-            person: {
-              category: {
-                name: {
-                  contains: search,
-                  mode: "insensitive",
-                },
-              },
-            },
-          },
-          {
-            room: {
-              contains: search,
-              mode: "insensitive",
-            },
-          },
-        ],
+          ],
+        }),
       },
       orderBy: [
-        {
-          person: {
-            category: {
-              name: "asc", // 1. kategori dulu
-            },
-          },
-        },
-        {
-          person: {
-            name: "asc", // 2. nama dokter
-          },
-        },
-        {
-          startTime: "asc", // 3. jadwal
-        },
+        { startTime: "asc" },
+        { person: { category: { name: "asc" } } },
+        { person: { name: "asc" } },
       ],
       include: {
-        person: {
-          include: { category: true },
-        },
+        person: { include: { category: true } },
       },
     });
 
-    return NextResponse.json(onCalls);
+    return NextResponse.json({
+      data: onCalls,
+      weekStart: weekStart.toISOString(),
+      weekEnd: weekEnd.toISOString(),
+      weekOffset,
+    });
   } catch (error) {
     return handleApiError(error);
   }
