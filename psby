@@ -1,0 +1,2 @@
+Remove-Item Alias:npm -ErrorAction Ignore
+Set-Alias npm "C:\Program Files\nodejs\npm.cmd"
