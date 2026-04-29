@@ -7,4 +7,12 @@ declare global {
     email: string;
     };
   }
+  export interface PersonOnCall extends Prisma.PersonOnCall {
+    person: {
+      id: string;
+      name: string;
+      code: string;
+      category: { id: string; name: string };
+    };
+  }
 }

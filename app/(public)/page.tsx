@@ -36,23 +36,64 @@ type WeekResponse = {
   weekOffset: number;
 };
 
-const CATEGORY_COLORS: Record<string, string> = {
-  "PENYAKIT DALAM": "bg-blue-50 border-blue-200 text-blue-800",
-  ANAK: "bg-green-50 border-green-200 text-green-800",
-  OBSGYN: "bg-pink-50 border-pink-200 text-pink-800",
-  "BEDAH UMUM": "bg-orange-50 border-orange-200 text-orange-800",
-  ANESTESI: "bg-purple-50 border-purple-200 text-purple-800",
-  "BEDAH DIGESTIF": "bg-amber-50 border-amber-200 text-amber-800",
-  "BEDAH TULANG": "bg-slate-50 border-slate-200 text-slate-800",
-  "BEDAH SYARAF": "bg-indigo-50 border-indigo-200 text-indigo-800",
-  PARU: "bg-cyan-50 border-cyan-200 text-cyan-800",
-  KARDIOLOGI: "bg-red-50 border-red-200 text-red-800",
-  NEUROLOGI: "bg-violet-50 border-violet-200 text-violet-800",
-  RADIOLOGI: "bg-teal-50 border-teal-200 text-teal-800",
+const categoryColorCache = new Map<string, { bg: string; border: string; text: string }>();
+
+const GOLDEN_ANGLE = 137.508;
+const PREDEFINED_HUES: Record<string, number> = {
+  "PENYAKIT DALAM": 210,
+  ANAK: 130,
+  OBSGYN: 340,
+  "BEDAH UMUM": 25,
+  ANESTESI: 270,
+  "BEDAH DIGESTIF": 50,
+  "BEDAH TULANG": 195,
+  "BEDAH SYARAF": 240,
+  PARU: 170,
+  KARDIOLOGI: 0,
+  NEUROLOGI: 290,
+  RADIOLOGI: 160,
+  THT: 75,
+  MATA: 95,
+  UROLOGI: 310,
+  IT: 185,
+  Keperawatan: 115,
+  Management: 35,
+  "BEDAH PLASTIK": 320,
+  ENDOVASCULAR: 145,
+  "MAINTENANCE MEDIS": 60,
+  "CARDIAC INTERVENSI": 15,
+  "ON-SITE ANAK": 110,
+  "ON-SITE PENYAKIT DALAM": 220,
+  "ON-SITE OBGYN": 350,
+  "ON-SITE BEDAH UMUM": 40,
+  "BEDAH VASKULAR": 255,
+  "BEDAH ANAK": 155,
+  "BEDAH ONKOLOGI": 200,
+  "BEDAH THORAKS": 280,
 };
 
 function getCategoryColor(name: string) {
-  return CATEGORY_COLORS[name] ?? "bg-gray-50 border-gray-200 text-gray-800";
+  if (categoryColorCache.has(name)) return categoryColorCache.get(name)!;
+
+  let hue: number;
+  if (name in PREDEFINED_HUES) {
+    hue = PREDEFINED_HUES[name];
+  } else {
+    let hash = 5381;
+    for (let i = 0; i < name.length; i++) {
+      hash = (hash * 33) ^ name.charCodeAt(i);
+    }
+    hue = Math.abs(hash) % 360;
+  }
+
+  const color = {
+    bg: `hsl(${hue}, 65%, 94%)`,
+    border: `hsl(${hue}, 55%, 78%)`,
+    text: `hsl(${hue}, 60%, 28%)`,
+  };
+
+  categoryColorCache.set(name, color);
+  return color;
 }
 
 function toLocalDateStr(isoString: string): string {
@@ -75,12 +116,15 @@ function buildDayGrid(weekStart: string, entries: PersonOnCall[]) {
     const dayEntries = entries.filter(
       (oc) => toLocalDateStr(oc.startTime) === dayStr,
     );
-    const byCategory = dayEntries.reduce((acc, oc) => {
-      const cat = oc.person.category.name;
-      if (!acc[cat]) acc[cat] = [];
-      acc[cat].push(oc);
-      return acc;
-    }, {} as Record<string, PersonOnCall[]>);
+    const byCategory = dayEntries.reduce(
+      (acc, oc) => {
+        const cat = oc.person.category.name;
+        if (!acc[cat]) acc[cat] = [];
+        acc[cat].push(oc);
+        return acc;
+      },
+      {} as Record<string, PersonOnCall[]>,
+    );
     return { day, dayStr, byCategory, total: dayEntries.length };
   });
 }
@@ -90,9 +134,7 @@ const DAY_SHORT = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
 function WeekGrid({ week, search }: { week: WeekResponse; search: string }) {
   const days = buildDayGrid(week.weekStart, week.data);
   const today = toLocalDateStr(new Date().toISOString());
-  const weekLabel = `${format(new Date(week.weekStart), "d MMM", {
-    locale: localeId,
-  })} – ${format(new Date(week.weekEnd), "d MMM yyyy", { locale: localeId })}`;
+  const weekLabel = `${format(new Date(week.weekStart), "d MMM", { locale: localeId })} – ${format(new Date(week.weekEnd), "d MMM yyyy", { locale: localeId })}`;
 
   return (
     <div className="space-y-3">
@@ -148,28 +190,30 @@ function WeekGrid({ week, search }: { week: WeekResponse; search: string }) {
                     {search ? "Tidak ada hasil" : "Tidak ada jadwal"}
                   </p>
                 ) : (
-                  categories.map(([catName, persons]) => (
-                    <div
-                      key={catName}
-                      className={`rounded-md border px-2 py-1 ${getCategoryColor(
-                        catName,
-                      )}`}
-                    >
-                      <p className="text-[9px] font-bold uppercase tracking-wide opacity-50 leading-none mb-0.5">
-                        {catName}
-                      </p>
-                      {persons.map((oc) => (
-                        <p
-                          key={oc.id}
-                          className="text-[11px] font-medium leading-snug"
-                        >
-                          {oc.person.name !== oc.person.code
-                            ? oc.person.name
-                            : oc.person.code}
+                  categories.map(([catName, persons]) => {
+                    const color = getCategoryColor(catName);
+                    return (
+                      <div
+                        key={catName}
+                        className="rounded-md border px-2 py-1"
+                        style={{ backgroundColor: color.bg, borderColor: color.border, color: color.text }}
+                      >
+                        <p className="text-[9px] font-bold uppercase tracking-wide opacity-60 leading-none mb-0.5">
+                          {catName}
                         </p>
-                      ))}
-                    </div>
-                  ))
+                        {persons.map((oc) => (
+                          <p
+                            key={oc.id}
+                            className="text-[11px] font-medium leading-snug"
+                          >
+                            {oc.person.name !== oc.person.code
+                              ? oc.person.name
+                              : oc.person.code}
+                          </p>
+                        ))}
+                      </div>
+                    );
+                  })
                 )}
               </div>
             </div>
@@ -265,11 +309,7 @@ export default function OnCallViewPage() {
       ) : (
         <div className="space-y-8">
           {(data ?? []).map((week) => (
-            <WeekGrid
-              key={week.weekOffset}
-              week={week}
-              search={debouncedSearch}
-            />
+            <WeekGrid key={week.weekOffset} week={week} search={debouncedSearch} />
           ))}
           <div className="flex justify-center">
             <Button
