@@ -1,5 +1,5 @@
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
-import { Navbar } from "@/components/landing/navbar";
+import { Navbar } from "@/components/oncall/navbar";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],

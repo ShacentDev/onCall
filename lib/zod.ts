@@ -78,9 +78,23 @@ export const editPersonOnCallSchema = z.object({
   endTime: z.string().min(1, "Waktu selesai wajib diisi"),
   notes: z.string().optional(),
 });
+
+export const pingSingleSchema = z.object({
+  ip: z.string().regex(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/),
+});
+ 
+export const pingAllSchema = z.object({
+  all: z.literal(true),
+});
+ 
+export const pingRequestSchema = z.union([pingSingleSchema, pingAllSchema]);
+ 
+
 export type EditPersonOnCallSchema = z.infer<typeof editPersonOnCallSchema>;
 
 export const deletePersonOnCallSchema = z.object({
   id: z.string().min(1),
 });
 export type DeletePersonOnCallSchema = z.infer<typeof deletePersonOnCallSchema>;
+
+

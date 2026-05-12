@@ -1,38 +1,16 @@
-import { categoryColorCache, DAY_SHORT, PREDEFINED_HUES } from "@/lib/oncall-data";
-
+import { getCategoryColor } from "../oncall-function";
+import { toLocalDateStr } from "../local-date-string";
 import { format } from "date-fns";
-import { toLocalDateStr } from "./local-date-string";
+import { enUS as localeId } from "date-fns/locale";
 
-type WeekResponse = {
+export type WeekResponse = {
   data: PersonOnCall[];
   weekStart: string;
   weekEnd: string;
   weekOffset: number;
 };
 
-export function getCategoryColor(name: string) {
-  if (categoryColorCache.has(name)) return categoryColorCache.get(name)!;
-
-  let hue: number;
-  if (name in PREDEFINED_HUES) {
-    hue = PREDEFINED_HUES[name];
-  } else {
-    let hash = 5381;
-    for (let i = 0; i < name.length; i++) {
-      hash = (hash * 33) ^ name.charCodeAt(i);
-    }
-    hue = Math.abs(hash) % 360;
-  }
-
-  const color = {
-    bg: `hsl(${hue}, 65%, 94%)`,
-    border: `hsl(${hue}, 55%, 78%)`,
-    text: `hsl(${hue}, 60%, 28%)`,
-  };
-
-  categoryColorCache.set(name, color);
-  return color;
-}
+const DAY_SHORT = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export function buildDayGrid(weekStart: string, entries: PersonOnCall[]) {
   const start = new Date(weekStart);
@@ -62,7 +40,7 @@ export function buildDayGrid(weekStart: string, entries: PersonOnCall[]) {
 export function WeekGrid({ week, search }: { week: WeekResponse; search: string }) {
   const days = buildDayGrid(week.weekStart, week.data);
   const today = toLocalDateStr(new Date().toISOString());
-  const weekLabel = `${format(new Date(week.weekStart), "d MMM")} – ${format(new Date(week.weekEnd), "d MMM yyyy")}`;
+  const weekLabel = `${format(new Date(week.weekStart), "d MMM", { locale: localeId })} – ${format(new Date(week.weekEnd), "d MMM yyyy", { locale: localeId })}`;
 
   return (
     <div className="space-y-3">
@@ -71,7 +49,7 @@ export function WeekGrid({ week, search }: { week: WeekResponse; search: string 
           {weekLabel}
         </span>
         <span className="text-xs text-muted-foreground">
-          ({week.data.length} jadwal)
+          ({week.data.length} schedules)
         </span>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
@@ -97,7 +75,7 @@ export function WeekGrid({ week, search }: { week: WeekResponse; search: string 
                     {DAY_SHORT[i]}
                   </p>
                   <p className="text-sm font-bold leading-none">
-                    {format(day, "d MMM")}
+                    {format(day, "d MMM", { locale: localeId })}
                   </p>
                 </div>
                 {total > 0 && (
@@ -115,7 +93,7 @@ export function WeekGrid({ week, search }: { week: WeekResponse; search: string 
               <div className="flex flex-col gap-1.5 p-2 flex-1 min-h-[80px]">
                 {categories.length === 0 ? (
                   <p className="text-[11px] text-muted-foreground text-center py-3">
-                    {search ? "Tidak ada hasil" : "Tidak ada jadwal"}
+                    {search ? "No results found" : "No schedule"}
                   </p>
                 ) : (
                   categories.map(([catName, persons]) => {
