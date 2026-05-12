@@ -17,19 +17,19 @@ const geistMono = Geist_Mono({
 });
 
 const SITE_URL = process.env.WEBSITE_URL || "https://www.OnCall.com";
-const SITE_NAME = "Manajemen OnCall Indonesia";
+const SITE_NAME = "RSPB";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
 
   title: {
     default:
-      "Manajemen OnCall Indonesia | Catering & Snack Box Tradisional Sejak 2017",
-    template: "%s | Manajemen OnCall Indonesia",
+      "RSPB Internal Modules",
+    template: "%s | RSPB",
   },
 
   description:
-    "Manajemen OnCall Indonesia telah beroperasi sejak 2017 sebagai penyedia layanan katering profesional yang menghadirkan beragam pilihan snack box, hidangan kuliner, dan jajanan khas Nusantara dengan cita rasa autentik. Berpengalaman melayani ratusan kebutuhan acara, mulai dari kegiatan korporat, pernikahan, hingga berbagai gathering eksklusif. Kami berkomitmen menghadirkan kualitas terbaik, layanan yang andal, serta pengalaman kuliner yang berkesan di setiap kesempatan. Tersedia layanan pengiriman untuk area Jabodetabek.",
+    "RSPB telah beroperasi sejak 2017 sebagai penyedia layanan katering profesional yang menghadirkan beragam pilihan snack box, hidangan kuliner, dan jajanan khas Nusantara dengan cita rasa autentik. Berpengalaman melayani ratusan kebutuhan acara, mulai dari kegiatan korporat, pernikahan, hingga berbagai gathering eksklusif. Kami berkomitmen menghadirkan kualitas terbaik, layanan yang andal, serta pengalaman kuliner yang berkesan di setiap kesempatan. Tersedia layanan pengiriman untuk area Jabodetabek.",
 
   keywords: [
     "catering Jakarta",
@@ -54,9 +54,9 @@ export const metadata: Metadata = {
     "catering halal Jakarta",
   ],
 
-  authors: [{ name: "Manajemen OnCall Indonesia", url: SITE_URL }],
-  creator: "Manajemen OnCall Indonesia",
-  publisher: "Manajemen OnCall Indonesia",
+  authors: [{ name: "RSPB", url: SITE_URL }],
+  creator: "RSPB",
+  publisher: "RSPB",
 
   alternates: {
     canonical: "/",
@@ -71,7 +71,7 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: SITE_NAME,
     title:
-      "Manajemen OnCall Indonesia | Catering & Snack Box Tradisional Sejak 2017",
+      "RSPB",
     description:
       "Catering, snack box, dan nasi box tradisional dengan standar modern dan cita rasa autentik Nusantara. Melayani ratusan acara sejak 2017. Pesan untuk Jabodetabek.",
     images: [
@@ -79,7 +79,7 @@ export const metadata: Metadata = {
         url: "/images/og-image.jpg", // Buat gambar 1200x630px yang menarik
         width: 1200,
         height: 630,
-        alt: "Manajemen OnCall Indonesia - Catering & Snack Box Tradisional",
+        alt: "RSPB - Catering & Snack Box Tradisional",
         type: "image/jpeg",
       },
     ],
@@ -88,7 +88,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title:
-      "Manajemen OnCall Indonesia | Catering & Snack Box Tradisional Sejak 2017",
+      "RSPB",
     description:
       "Catering, snack box, dan nasi box tradisional dengan standar modern. Melayani ratusan acara sejak 2017 untuk Jabodetabek.",
     images: ["/images/og-image.jpg"],
@@ -218,7 +218,7 @@ export default function RootLayout({
       {
         "@type": ["FoodEstablishment", "LocalBusiness"],
         "@id": `${SITE_URL}/#business`,
-        name: "Manajemen OnCall Indonesia",
+        name: "RSPB",
         alternateName: "Manajemen OnCall",
         description:
           "Catering, snack box, dan nasi box tradisional Indonesia dengan cita rasa autentik dan standar produksi modern. Melayani berbagai acara sejak 2017.",

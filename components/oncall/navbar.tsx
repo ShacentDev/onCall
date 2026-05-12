@@ -37,7 +37,7 @@ export function Navbar() {
         </div>
         <div className="leading-tight">
           <div className="font-bold text-[17px] text-stone-900 font-serif tracking-tight">
-            OnCall
+            Internal System
           </div>
           <div className="text-[11px] text-stone-500 uppercase tracking-widest font-medium">
             RS Premier Bintaro
