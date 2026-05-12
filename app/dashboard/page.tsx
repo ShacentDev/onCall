@@ -5,7 +5,7 @@ import Loading from "@/components/loading";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { OnCallPublic } from "@/components/landing/oncall-section";
+import { OnCallPublic } from "@/components/oncall/oncall-section";
 import { Separator } from "@/components/ui/separator";
 import { PieChart } from "lucide-react";
 
