@@ -1,6 +1,7 @@
 import { categoryColorCache, DAY_SHORT, PREDEFINED_HUES } from "@/lib/oncall-data";
 
 import { format } from "date-fns";
+import { toLocalDateStr } from "./local-date-string";
 
 type WeekResponse = {
   data: PersonOnCall[];
@@ -8,14 +9,6 @@ type WeekResponse = {
   weekEnd: string;
   weekOffset: number;
 };
-
-export function toLocalDateStr(isoString: string): string {
-  const d = new Date(isoString);
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}`;
-}
 
 export function getCategoryColor(name: string) {
   if (categoryColorCache.has(name)) return categoryColorCache.get(name)!;

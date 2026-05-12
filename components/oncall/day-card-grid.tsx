@@ -1,4 +1,5 @@
-import { getCategoryColor, toLocalDateStr } from "../oncall-function";
+import { getCategoryColor } from "../oncall-function";
+import { toLocalDateStr } from "../local-date-string";
 import { format } from "date-fns";
 import { enUS as localeId } from "date-fns/locale";
 
