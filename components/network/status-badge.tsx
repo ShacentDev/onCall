@@ -32,7 +32,7 @@ export function StatusBadge({ status, latency }: StatusBadgeProps) {
   const config = statusConfig[status];
 
   return (
-    <Badge variant="outline" className={cn("gap-1.5 font-medium", config.badge)}>
+    <Badge variant="outline" className={cn("gap-1.5 font-medium shrink-0", config.badge)}>
       <span className={cn("h-1.5 w-1.5 rounded-full", config.dot)} />
       {config.label}
       {status === "online" && latency !== null && latency !== undefined && (

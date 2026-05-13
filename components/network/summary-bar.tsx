@@ -1,5 +1,5 @@
 import { CheckCircle2, XCircle, HelpCircle, Network } from "lucide-react";
-import { SwitchWithStatus } from "./switch-card";
+import { SwitchWithStatus } from "@/components/network/switch-card";
 
 interface SummaryBarProps {
   switches: SwitchWithStatus[];
