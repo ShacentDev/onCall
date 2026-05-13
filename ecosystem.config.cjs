@@ -1,14 +1,16 @@
 module.exports = {
   apps: [
     {
-      name: "oncall",
+      name: "internal",
       script: "node_modules/next/dist/bin/next",
-      args: "start --port 3000",
+      args: "dev",
       cwd: "C:\\Users\\muhammad.hauzan\\Documents\\GitHub\\onCall",
-      interpreter: "node",
+      instances: 1,
+      exec_mode: "fork",
+      watch: false,
       env: {
-        NODE_ENV: "production",
-        PORT: "3000",
+        NODE_ENV: "development",
+        PORT: 3000,
       },
     },
   ],
