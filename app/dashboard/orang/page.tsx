@@ -4,7 +4,7 @@ import { DataTable } from "@/components/data-table";
 import { personColumns } from "./column";
 import { useSession } from "@/lib/client-session";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import { createPersonSchema, CreatePersonSchema } from "@/lib/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,7 +12,7 @@ import { apiRequest } from "@/lib/api-client";
 import { toast } from "sonner";
 import Loading from "@/components/loading";
 import { Controller, useForm } from "react-hook-form";
-import { Users, Plus } from "lucide-react";
+import { Users, Plus, Upload, FileSpreadsheet, Loader2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -31,20 +31,31 @@ import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Badge } from "@/components/ui/badge";
 
-type Category = { id: string; name: string };
+type ParsedPerson = { kode: string; nama: string };
 
 const PersonPage = () => {
   const { user, isLoading } = useSession();
   const router = useRouter();
   const isUserValid = user?.role === "admin" && !isLoading;
 
-  const { data: persons, isLoading: isLoadingPersons } = useSWR(
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [parsedPersons, setParsedPersons] = useState<ParsedPerson[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isApplying, setIsApplying] = useState(false);
+
+  const { data: persons, isLoading: isLoadingPersons, mutate: mutatePersons } = useSWR<Person[]>(
     isUserValid ? "/api/person" : null,
   );
   const { data: categories } = useSWR<Category[]>(
     isUserValid ? "/api/category" : null,
   );
+
+  const totalOnCalls = persons?.reduce(
+    (sum, p) => sum + (p.onCalls?.length ?? 0),
+    0,
+  ) ?? 0;
 
   const form = useForm<CreatePersonSchema>({
     resolver: zodResolver(createPersonSchema),
@@ -64,6 +75,60 @@ const PersonPage = () => {
     }
   };
 
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    setParsedPersons([]);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/person/excel/", {
+        method: "POST",
+        body: formData,
+      });
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        toast.error(json.message ?? "Gagal membaca file.");
+        return;
+      }
+
+      setParsedPersons(json.persons);
+      toast.success(`${json.persons.length} data berhasil dibaca dari file.`);
+    } catch {
+      toast.error("Terjadi kesalahan saat membaca file.");
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleApply = async () => {
+    if (parsedPersons.length === 0) return;
+
+    setIsApplying(true);
+
+    try {
+      const res = await apiRequest({
+        url: "/api/person/excel/apply",
+        method: "POST",
+        data: { persons: parsedPersons },
+        revalidate: "/api/person",
+      });
+
+      if (res && typeof res !== "string") {
+        setParsedPersons([]);
+      }
+    } finally {
+      setIsApplying(false);
+    }
+  };
+
   useEffect(() => {
     if (!isUserValid && !isLoading && user) {
       toast.error("Akses ditolak. Hanya untuk Admin.");
@@ -76,16 +141,25 @@ const PersonPage = () => {
 
   return (
     <div className="space-y-6 pb-24 md:pb-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-          <Users className="h-8 w-8" />
-          Manajemen Person
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Kelola data person on call dalam sistem.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+            <Users className="h-8 w-8" />
+            Manajemen Person
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Kelola data person on call dalam sistem.
+          </p>
+        </div>
+        <div className="flex flex-col items-end gap-1 shrink-0">
+          <Badge variant="secondary" className="text-sm px-3 py-1">
+            {persons?.length ?? 0} personal terdaftar
+          </Badge>
+        </div>
       </div>
+
       <Separator />
+
       <Card>
         <CardHeader>
           <CardTitle>Daftar Person</CardTitle>
@@ -100,6 +174,86 @@ const PersonPage = () => {
             filterColumn="name"
             filterPlaceholder="Filter nama..."
           />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileSpreadsheet className="h-5 w-5" />
+            Import Nama dari Excel
+          </CardTitle>
+          <CardDescription>
+            Upload file Excel dengan kolom <strong>kode</strong> dan{" "}
+            <strong>nama</strong> untuk memperbarui nama person secara massal
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".xlsx,.xls"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+            <Button
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading || isApplying}
+              className="gap-2"
+            >
+              {isUploading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Upload className="h-4 w-4" />
+              )}
+              {isUploading ? "Membaca file..." : "Pilih File Excel"}
+            </Button>
+
+            {parsedPersons.length > 0 && (
+              <Button
+                onClick={handleApply}
+                disabled={isApplying}
+                className="gap-2"
+              >
+                {isApplying ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <FileSpreadsheet className="h-4 w-4" />
+                )}
+                {isApplying
+                  ? "Mengupdate..."
+                  : `Update ${parsedPersons.length} Nama`}
+              </Button>
+            )}
+          </div>
+
+          {parsedPersons.length > 0 && (
+            <div className="rounded-md border overflow-hidden">
+              <div className="bg-muted px-4 py-2 text-sm font-medium">
+                Preview — {parsedPersons.length} data siap diupdate
+              </div>
+              <div className="max-h-64 overflow-y-auto">
+                <table className="w-full text-sm">
+                  <thead className="border-b bg-muted/50">
+                    <tr>
+                      <th className="px-4 py-2 text-left font-medium">Kode</th>
+                      <th className="px-4 py-2 text-left font-medium">Nama</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {parsedPersons.map((p) => (
+                      <tr key={p.kode} className="border-b last:border-0">
+                        <td className="px-4 py-2 font-mono text-xs">{p.kode}</td>
+                        <td className="px-4 py-2">{p.nama}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
