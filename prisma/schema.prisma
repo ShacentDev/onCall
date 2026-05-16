@@ -136,7 +136,7 @@ model PersonOnCall {
   updatedAt      DateTime @updatedAt
   createdById    String
   createdBy      User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
-
+  @@unique([room, startTime])
   @@index([personId])
   @@index([createdById])
   @@map("person_on_call")

@@ -4,7 +4,7 @@ import { requireAdmin } from "@/lib/session";
 import { handleApiError } from "@/lib/errors";
 import * as XLSX from "xlsx";
 
-const SPECIALIZATION_COLUMNS = [
+export const SPECIALIZATION_COLUMNS = [
   "PENYAKIT DALAM",
   "ANAK",
   "OBSGYN",
@@ -37,9 +37,9 @@ const SPECIALIZATION_COLUMNS = [
   "BEDAH THORAKS",
 ];
 
-const DATE_COLUMN = "TGL (dd-mm-yyyy)";
+export const DATE_COLUMN = "TGL (dd-mm-yyyy)";
 
-function parseExcelDate(raw: any): Date | null {
+export function parseExcelDate(raw: any): Date | null {
   if (raw === null || raw === undefined || raw === "") return null;
 
   if (typeof raw === "number") {
@@ -62,10 +62,18 @@ function parseExcelDate(raw: any): Date | null {
     return new Date(Date.UTC(Number(yyyy), Number(mm) - 1, Number(dd)));
   }
 
+  // Handle ISO datetime string from Excel (e.g. "2026-05-01T00:00:00.000Z" or "2026-05-01 00:00:00")
+  const isoDate = str.match(/^(\d{4})-(\d{2})-(\d{2})[T ].*$/);
+  if (isoDate) {
+    const [, yyyy, mm, dd] = isoDate;
+    return new Date(Date.UTC(Number(yyyy), Number(mm) - 1, Number(dd)));
+  }
+
   const parsed = new Date(str);
   return isNaN(parsed.getTime()) ? null : parsed;
 }
 
+// GET: Export template or existing data as Excel
 export async function GET() {
   try {
     await requireAdmin();
@@ -81,7 +89,10 @@ export async function GET() {
     for (const oc of onCalls) {
       const dateKey = oc.startTime.toISOString().split("T")[0];
       if (!dateMap.has(dateKey)) dateMap.set(dateKey, {});
-      dateMap.get(dateKey)![oc.room] = oc.person.code;
+      // Only keep first doctor per room per day (prevent overwrite showing duplicates)
+      if (!dateMap.get(dateKey)![oc.room]) {
+        dateMap.get(dateKey)![oc.room] = oc.person.code;
+      }
     }
 
     const rows: any[][] = [headers];
@@ -117,6 +128,7 @@ export async function GET() {
   }
 }
 
+// POST: Parse & validate uploaded Excel, return preview for confirmation
 export async function POST(request: NextRequest) {
   try {
     await requireAdmin();
@@ -153,6 +165,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Warn about any SPECIALIZATION_COLUMNS missing from the uploaded file
+    const missingHeaders = SPECIALIZATION_COLUMNS.filter(
+      (col) => !actualHeaders.includes(col),
+    );
+    if (missingHeaders.length > 0) {
+      console.warn(
+        `[oncall/upload] Kolom tidak ditemukan di file: ${missingHeaders.join(", ")}`,
+      );
+    }
+
     const existingPersons = await prisma.person.findMany({
       include: { category: true },
     });
@@ -171,6 +193,9 @@ export async function POST(request: NextRequest) {
       startTime: string;
       endTime: string;
     }[] = [];
+
+    // Track unique entries within THIS upload to catch intra-file duplicates
+    const seenInFile = new Set<string>();
 
     const newPersonsMap = new Map<
       string,
@@ -197,8 +222,16 @@ export async function POST(request: NextRequest) {
       const endTime = `${dateStr}T23:59:59.000Z`;
 
       for (const col of SPECIALIZATION_COLUMNS) {
+        // Skip columns not present in uploaded file
+        if (!actualHeaders.includes(col)) continue;
+
         const code = row[col]?.toString().trim();
         if (!code) continue;
+
+        // Deduplicate within the file itself (same doctor, same room, same day)
+        const inFileKey = `${code}|${dateStr}|${col}`;
+        if (seenInFile.has(inFileKey)) continue;
+        seenInFile.add(inFileKey);
 
         const existingPerson = personByCode.get(code);
 
@@ -228,40 +261,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const existingOnCalls =
-      toCreate.length > 0
-        ? await prisma.personOnCall.findMany({
-            where: {
-              startTime: {
-                gte: new Date(
-                  Math.min(
-                    ...toCreate.map((r) => new Date(r.startTime).getTime()),
-                  ),
-                ),
-                lte: new Date(
-                  Math.max(
-                    ...toCreate.map((r) => new Date(r.endTime).getTime()),
-                  ),
-                ),
-              },
-            },
-            include: { person: true },
-          })
-        : [];
+    // Check duplicates against DB using reduce (safe for large arrays, avoids spread stack overflow)
+    let existingOnCalls: Awaited<
+      ReturnType<typeof prisma.personOnCall.findMany>
+    > & { person: { code: string } }[] = [] as any;
 
+    if (toCreate.length > 0) {
+      const minTime = toCreate.reduce((min, r) => {
+        const t = new Date(r.startTime).getTime();
+        return t < min ? t : min;
+      }, Infinity);
+      const maxTime = toCreate.reduce((max, r) => {
+        const t = new Date(r.endTime).getTime();
+        return t > max ? t : max;
+      }, -Infinity);
+
+      existingOnCalls = await prisma.personOnCall.findMany({
+        where: {
+          startTime: {
+            gte: new Date(minTime),
+            lte: new Date(maxTime),
+          },
+        },
+        include: { person: true },
+      });
+    }
+
+    // Key: personCode|date|room — prevents same doctor in same room on same day
     const existingKeys = new Set(
       existingOnCalls.map(
-        (oc) =>
-          `${oc.person.code}|${oc.startTime.toISOString().split("T")[0]}|${
-            oc.room
-          }`,
+        (oc: any) =>
+          `${oc.person.code}|${oc.startTime.toISOString().split("T")[0]}|${oc.room}`,
       ),
     );
 
     const duplicates = toCreate.filter((item) =>
-      existingKeys.has(
-        `${item.personCode}|${item.date}|${item.specialization}`,
-      ),
+      existingKeys.has(`${item.personCode}|${item.date}|${item.specialization}`),
     );
 
     const newEntries = toCreate.filter(
@@ -279,6 +314,7 @@ export async function POST(request: NextRequest) {
       newCategories: Array.from(newCategoriesSet),
       newPersons: Array.from(newPersonsMap.values()),
       totalRows: toCreate.length,
+      missingHeaders,
     });
   } catch (err) {
     return handleApiError(err);

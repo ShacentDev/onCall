@@ -241,6 +241,7 @@ export type OnCallOrderByWithRelationInput = {
 
 export type OnCallWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  room_startTime?: Prisma.OnCallRoomStartTimeCompoundUniqueInput
   AND?: Prisma.OnCallWhereInput | Prisma.OnCallWhereInput[]
   OR?: Prisma.OnCallWhereInput[]
   NOT?: Prisma.OnCallWhereInput | Prisma.OnCallWhereInput[]
@@ -254,7 +255,7 @@ export type OnCallWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"OnCall"> | Date | string
   createdById?: Prisma.StringFilter<"OnCall"> | string
   createdBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-}, "id">
+}, "id" | "room_startTime">
 
 export type OnCallOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -386,6 +387,11 @@ export type OnCallListRelationFilter = {
 
 export type OnCallOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type OnCallRoomStartTimeCompoundUniqueInput = {
+  room: string
+  startTime: Date | string
 }
 
 export type OnCallCountOrderByAggregateInput = {
