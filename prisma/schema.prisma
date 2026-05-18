@@ -125,19 +125,23 @@ model Person {
 }
 
 model PersonOnCall {
-  id             String   @id @default(cuid())
-  personId       String
-  person         Person   @relation(fields: [personId], references: [id], onDelete: Cascade)
-  room           String
-  startTime      DateTime
-  endTime        DateTime
-  notes          String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  createdById    String
-  createdBy      User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
-
+  id          String   @id @default(cuid())
+  personId    String
+  person      Person   @relation(fields: [personId], references: [id], onDelete: Cascade)
+  room        String
+  date        String
+  startTime   DateTime
+  endTime     DateTime
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdById String
+  createdBy   User @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  @@unique([personId, room, date])
   @@index([personId])
+  @@index([room])
+  @@index([date])
   @@index([createdById])
+
   @@map("person_on_call")
 }

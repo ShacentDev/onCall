@@ -12,8 +12,7 @@ import {
   Search,
   Loader2,
 } from "lucide-react";
-import { WeekGrid } from "@/components/oncall-function";
-import { WeekResponse } from "@/components/oncall/day-card-grid";
+import { WeekGrid, WeekResponse } from "@/components/oncall/day-card-grid";
 
 export default function OnCallViewPage() {
   const [startOffset, setStartOffset] = useState(0);

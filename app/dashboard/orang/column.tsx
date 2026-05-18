@@ -29,18 +29,6 @@ import { useState } from "react";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import useSWR from "swr";
 
-type Category = { id: string; name: string };
-
-type Person = {
-  id: string;
-  name: string;
-  code: string;
-  categoryId: string;
-  category: Category;
-  createdAt: string;
-  updatedAt: string;
-};
-
 export const personColumns: ColumnDef<Person>[] = [
   {
     accessorKey: "code",

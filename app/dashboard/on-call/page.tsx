@@ -34,13 +34,6 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { DateTimePicker } from "@/components/time-picker";
 import { ImportOnCallDialog } from "@/components/import-oncall";
 
-type Person = {
-  id: string;
-  name: string;
-  code: string;
-  category: { name: string };
-};
-
 type ImportOnCallResult = {
   toCreate: {
     personId: string | null;
@@ -183,7 +176,7 @@ const PersonOnCallPage = () => {
           <DataTable
             columns={personOnCallColumns}
             data={onCalls || []}
-            filterColumn="personCode"
+            filterColumn="personName"
             filterPlaceholder="Filter menggunakan kode..."
           />
         </CardContent>
