@@ -34,13 +34,6 @@ import useSWR from "swr";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 
-type Person = {
-  id: string;
-  name: string;
-  code: string;
-  category: { name: string };
-};
-
 type PersonOnCall = {
   id: string;
   personId: string;
@@ -57,7 +50,6 @@ const formatDate = (iso: string) =>
   format(new Date(iso), "dd MMM yyyy", { locale: id });
 
 export const personOnCallColumns: ColumnDef<PersonOnCall>[] = [
-  // ✅ KODE
   {
     id: "personCode",
     header: "Kode",
@@ -66,8 +58,6 @@ export const personOnCallColumns: ColumnDef<PersonOnCall>[] = [
       <div className="font-mono font-medium">{row.original.person?.code}</div>
     ),
   },
-
-  // ✅ NAMA
   {
     id: "personName",
     accessorFn: (row) => row.person?.name,
@@ -83,8 +73,6 @@ export const personOnCallColumns: ColumnDef<PersonOnCall>[] = [
     ),
     cell: ({ row }) => <div>{row.original.person?.name}</div>,
   },
-
-  // ✅ KATEGORI
   {
     id: "categoryName",
     accessorFn: (row) => row.person?.category?.name,
@@ -93,15 +81,11 @@ export const personOnCallColumns: ColumnDef<PersonOnCall>[] = [
       <Badge variant="secondary">{row.original.person?.category?.name}</Badge>
     ),
   },
-
-  // ✅ RUANGAN
   {
     accessorKey: "room",
     id: "room",
     header: "Ruangan",
   },
-
-  // ✅ START TIME
   {
     accessorKey: "startTime",
     id: "startTime",
@@ -119,8 +103,6 @@ export const personOnCallColumns: ColumnDef<PersonOnCall>[] = [
       <div className="text-sm">{formatDate(row.getValue("startTime"))}</div>
     ),
   },
-
-  // ✅ ACTIONS
   {
     id: "actions",
     header: "Aksi",

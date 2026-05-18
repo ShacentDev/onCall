@@ -2,7 +2,7 @@
 
 import useSWR from "swr";
 import { useState, useRef } from "react";
-import { OnCallCard } from "../oncall-card";
+import { OnCallCard } from "./oncall-card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2 } from "lucide-react";
@@ -33,7 +33,6 @@ export function OnCallPublic() {
     `/api/oncall?search=${debouncedSearch}`
   );
 
-  // ================= GROUP BY CATEGORY =================
   const grouped = (data || []).reduce((acc: any, item: any) => {
     const category = item.person?.category?.name || "Lainnya";
 
@@ -47,8 +46,6 @@ export function OnCallPublic() {
 
   return (
     <div className="flex flex-col gap-10">
-
-      {/* 🔍 SEARCH (SELALU ADA) */}
       <div className="max-w-md relative">
         <Input
           placeholder="Cari dokter / kategori / ruangan..."

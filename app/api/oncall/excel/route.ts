@@ -39,38 +39,39 @@ export const SPECIALIZATION_COLUMNS = [
 
 export const DATE_COLUMN = "TGL (dd-mm-yyyy)";
 
-export function parseExcelDate(raw: any): Date | null {
+export function parseExcelDate(raw: any): string | null {
   if (raw === null || raw === undefined || raw === "") return null;
 
   if (typeof raw === "number") {
     const d = XLSX.SSF.parse_date_code(raw);
     if (!d) return null;
-    return new Date(Date.UTC(d.y, d.m - 1, d.d));
+
+    const yyyy = d.y.toString().padStart(4, "0");
+    const mm = d.m.toString().padStart(2, "0");
+    const dd = d.d.toString().padStart(2, "0");
+
+    return `${yyyy}-${mm}-${dd}`;
   }
 
   const str = raw.toString().trim();
 
   const ddmmyyyy = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+
   if (ddmmyyyy) {
     const [, dd, mm, yyyy] = ddmmyyyy;
-    return new Date(Date.UTC(Number(yyyy), Number(mm) - 1, Number(dd)));
+
+    return `${yyyy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}`;
   }
 
   const yyyymmdd = str.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+
   if (yyyymmdd) {
     const [, yyyy, mm, dd] = yyyymmdd;
-    return new Date(Date.UTC(Number(yyyy), Number(mm) - 1, Number(dd)));
+
+    return `${yyyy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}`;
   }
 
-  // Handle ISO datetime string from Excel (e.g. "2026-05-01T00:00:00.000Z" or "2026-05-01 00:00:00")
-  const isoDate = str.match(/^(\d{4})-(\d{2})-(\d{2})[T ].*$/);
-  if (isoDate) {
-    const [, yyyy, mm, dd] = isoDate;
-    return new Date(Date.UTC(Number(yyyy), Number(mm) - 1, Number(dd)));
-  }
-
-  const parsed = new Date(str);
-  return isNaN(parsed.getTime()) ? null : parsed;
+  return null;
 }
 
 // GET: Export template or existing data as Excel
@@ -205,52 +206,66 @@ export async function POST(request: NextRequest) {
 
     rows.forEach((row, index) => {
       const rowNum = index + 2;
+
       const rawDate = row[DATE_COLUMN];
 
-      if (rawDate === "" || rawDate === null || rawDate === undefined) return;
+      if (!rawDate) return;
 
       const parsedDate = parseExcelDate(rawDate);
+
       if (!parsedDate) {
         validationErrors.push(
-          `Baris ${rowNum}: Format tanggal tidak valid ("${rawDate}"). Gunakan format dd/mm/yyyy.`,
+          `Baris ${rowNum}: format tanggal invalid (${rawDate})`,
         );
         return;
       }
 
-      const dateStr = parsedDate.toISOString().split("T")[0];
-      const startTime = `${dateStr}T00:00:00.000Z`;
-      const endTime = `${dateStr}T23:59:59.000Z`;
+      const startTime = new Date(`${parsedDate}T00:00:00`);
+      const endTime = new Date(`${parsedDate}T23:59:59`);
 
       for (const col of SPECIALIZATION_COLUMNS) {
-        // Skip columns not present in uploaded file
         if (!actualHeaders.includes(col)) continue;
 
-        const code = row[col]?.toString().trim();
-        if (!code) continue;
+        const rawValue = row[col];
 
-        // Deduplicate within the file itself (same doctor, same room, same day)
-        const inFileKey = `${code}|${dateStr}|${col}`;
-        if (seenInFile.has(inFileKey)) continue;
-        seenInFile.add(inFileKey);
+        if (!rawValue) continue;
 
-        const existingPerson = personByCode.get(code);
+        // SUPPORT MULTIPLE PERSON
+        const codes = rawValue
+          .toString()
+          .split(/[\n,;]/)
+          .map((v: string) => v.trim())
+          .filter(Boolean);
 
-        if (!existingPerson && !newPersonsMap.has(code)) {
-          newPersonsMap.set(code, { code, categoryName: col });
+        for (const code of codes) {
+          const uniqueKey = `${code}|${parsedDate}|${col}`;
+
+          if (seenInFile.has(uniqueKey)) continue;
+
+          seenInFile.add(uniqueKey);
+
+          const existingPerson = personByCode.get(code);
+
+          if (!existingPerson && !newPersonsMap.has(code)) {
+            newPersonsMap.set(code, {
+              code,
+              categoryName: col,
+            });
+          }
+
+          if (!categoryByName.has(col)) {
+            newCategoriesSet.add(col);
+          }
+
+          toCreate.push({
+            personId: existingPerson?.id ?? null,
+            personCode: code,
+            specialization: col,
+            date: parsedDate,
+            startTime: startTime.toISOString(),
+            endTime: endTime.toISOString(),
+          });
         }
-
-        if (!categoryByName.has(col) && !newCategoriesSet.has(col)) {
-          newCategoriesSet.add(col);
-        }
-
-        toCreate.push({
-          personId: existingPerson?.id ?? null,
-          personCode: code,
-          specialization: col,
-          date: dateStr,
-          startTime,
-          endTime,
-        });
       }
     });
 
@@ -287,11 +302,10 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Key: personCode|date|room — prevents same doctor in same room on same day
     const existingKeys = new Set(
       existingOnCalls.map(
         (oc: any) =>
-          `${oc.person.code}|${oc.startTime.toISOString().split("T")[0]}|${oc.room}`,
+          `${oc.person.code}|${oc.date}|${oc.room}`,
       ),
     );
 

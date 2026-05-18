@@ -181,6 +181,7 @@ export const PersonOnCallScalarFieldEnum = {
   id: 'id',
   personId: 'personId',
   room: 'room',
+  date: 'date',
   startTime: 'startTime',
   endTime: 'endTime',
   notes: 'notes',

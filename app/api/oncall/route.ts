@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { handleApiError } from "@/lib/errors";
+
 import {
   createPersonOnCallSchema,
   deletePersonOnCallSchema,
   editPersonOnCallSchema,
 } from "@/lib/zod";
+
 import { requireAdmin } from "@/lib/session";
+
 import {
   startOfWeek,
   endOfWeek,
@@ -25,23 +28,70 @@ export async function GET(req: NextRequest) {
       const onCalls = await prisma.personOnCall.findMany({
         where: {
           OR: [
-            { person: { name: { contains: search, mode: "insensitive" } } },
-            { person: { code: { contains: search, mode: "insensitive" } } },
             {
               person: {
-                category: { name: { contains: search, mode: "insensitive" } },
+                name: {
+                  contains: search,
+                  mode: "insensitive",
+                },
               },
             },
-            { room: { contains: search, mode: "insensitive" } },
+
+            {
+              person: {
+                code: {
+                  contains: search,
+                  mode: "insensitive",
+                },
+              },
+            },
+
+            {
+              person: {
+                category: {
+                  name: {
+                    contains: search,
+                    mode: "insensitive",
+                  },
+                },
+              },
+            },
+
+            {
+              room: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
           ],
         },
+
         orderBy: [
-          { person: { category: { name: "asc" } } },
-          { person: { name: "asc" } },
-          { startTime: "asc" },
+          {
+            startTime: "asc",
+          },
+
+          {
+            person: {
+              category: {
+                name: "asc",
+              },
+            },
+          },
+
+          {
+            person: {
+              name: "asc",
+            },
+          },
         ],
+
         include: {
-          person: { include: { category: true } },
+          person: {
+            include: {
+              category: true,
+            },
+          },
         },
       });
 
@@ -50,38 +100,102 @@ export async function GET(req: NextRequest) {
 
     const weekOffset = parseInt(weekOffsetParam);
     const baseDate = addWeeks(new Date(), weekOffset);
-    const weekStart = startOfDay(startOfWeek(baseDate, { weekStartsOn: 1 }));
-    const weekEnd = endOfDay(endOfWeek(baseDate, { weekStartsOn: 1 }));
+    const weekStart = startOfDay(
+      startOfWeek(baseDate, {
+        weekStartsOn: 1,
+      }),
+    );
+
+    const weekEnd = endOfDay(
+      endOfWeek(baseDate, {
+        weekStartsOn: 1,
+      }),
+    );
 
     const onCalls = await prisma.personOnCall.findMany({
       where: {
-        startTime: { gte: weekStart, lte: weekEnd },
+        startTime: {
+          gte: weekStart,
+          lte: weekEnd,
+        },
+
         ...(search && {
           OR: [
-            { person: { name: { contains: search, mode: "insensitive" } } },
-            { person: { code: { contains: search, mode: "insensitive" } } },
             {
               person: {
-                category: { name: { contains: search, mode: "insensitive" } },
+                name: {
+                  contains: search,
+                  mode: "insensitive",
+                },
+              },
+            },
+
+            {
+              person: {
+                code: {
+                  contains: search,
+                  mode: "insensitive",
+                },
+              },
+            },
+
+            {
+              person: {
+                category: {
+                  name: {
+                    contains: search,
+                    mode: "insensitive",
+                  },
+                },
+              },
+            },
+
+            {
+              room: {
+                contains: search,
+                mode: "insensitive",
               },
             },
           ],
         }),
       },
+
       orderBy: [
-        { startTime: "asc" },
-        { person: { category: { name: "asc" } } },
-        { person: { name: "asc" } },
+        {
+          startTime: "asc",
+        },
+
+        {
+          person: {
+            category: {
+              name: "asc",
+            },
+          },
+        },
+
+        {
+          person: {
+            name: "asc",
+          },
+        },
       ],
+
       include: {
-        person: { include: { category: true } },
+        person: {
+          include: {
+            category: true,
+          },
+        },
       },
     });
 
     return NextResponse.json({
       data: onCalls,
+
       weekStart: weekStart.toISOString(),
+
       weekEnd: weekEnd.toISOString(),
+
       weekOffset,
     });
   } catch (error) {
@@ -91,26 +205,57 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    await requireAdmin();
-
-    const body = await req.json();
     const session = await requireAdmin();
 
+    const body = await req.json();
+
     const result = createPersonOnCallSchema.safeParse(body);
+
     if (!result.success) {
       return NextResponse.json(
-        { message: result.error.issues[0].message },
-        { status: 400 },
+        {
+          message: result.error.issues[0].message,
+        },
+        {
+          status: 400,
+        },
       );
     }
+
+    const category = await prisma.category.findFirst({
+      where: {
+        name: result.data.room,
+      },
+    });
+
+    if (category) {
+      await prisma.person.update({
+        where: {
+          id: result.data.personId,
+        },
+
+        data: {
+          categoryId: category.id,
+        },
+      });
+    }
+
+    const startDate = new Date(result.data.startTime);
 
     await prisma.personOnCall.create({
       data: {
         personId: result.data.personId,
+
         room: result.data.room,
+
+        date: startDate.toISOString().split("T")[0],
+
         startTime: new Date(result.data.startTime),
+
         endTime: new Date(result.data.endTime),
+
         notes: result.data.notes ?? null,
+
         createdById: session.user.id,
       },
     });
@@ -130,25 +275,61 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json();
 
     const result = editPersonOnCallSchema.safeParse(body);
+
     if (!result.success) {
       return NextResponse.json(
-        { message: result.error.issues[0].message },
-        { status: 400 },
+        {
+          message: result.error.issues[0].message,
+        },
+        {
+          status: 400,
+        },
       );
     }
 
+    const category = await prisma.category.findFirst({
+      where: {
+        name: result.data.room,
+      },
+    });
+
+    if (category) {
+      await prisma.person.update({
+        where: {
+          id: result.data.personId,
+        },
+
+        data: {
+          categoryId: category.id,
+        },
+      });
+    }
+
+    const startDate = new Date(result.data.startTime);
+
     await prisma.personOnCall.update({
-      where: { id: result.data.id },
+      where: {
+        id: result.data.id,
+      },
+
       data: {
         personId: result.data.personId,
+
         room: result.data.room,
+
+        date: startDate.toISOString().split("T")[0],
+
         startTime: new Date(result.data.startTime),
+
         endTime: new Date(result.data.endTime),
+
         notes: result.data.notes ?? null,
       },
     });
 
-    return NextResponse.json({ message: "Jadwal on call diperbarui." });
+    return NextResponse.json({
+      message: "Jadwal on call diperbarui.",
+    });
   } catch (error) {
     return handleApiError(error);
   }
@@ -161,18 +342,27 @@ export async function DELETE(req: NextRequest) {
     const body = await req.json();
 
     const result = deletePersonOnCallSchema.safeParse(body);
+
     if (!result.success) {
       return NextResponse.json(
-        { message: result.error.issues[0].message },
-        { status: 400 },
+        {
+          message: result.error.issues[0].message,
+        },
+        {
+          status: 400,
+        },
       );
     }
 
     await prisma.personOnCall.delete({
-      where: { id: result.data.id },
+      where: {
+        id: result.data.id,
+      },
     });
 
-    return NextResponse.json({ message: "Jadwal on call dihapus." });
+    return NextResponse.json({
+      message: "Jadwal on call dihapus.",
+    });
   } catch (error) {
     return handleApiError(error);
   }

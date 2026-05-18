@@ -28,6 +28,7 @@ export type PersonOnCallMinAggregateOutputType = {
   id: string | null
   personId: string | null
   room: string | null
+  date: string | null
   startTime: Date | null
   endTime: Date | null
   notes: string | null
@@ -40,6 +41,7 @@ export type PersonOnCallMaxAggregateOutputType = {
   id: string | null
   personId: string | null
   room: string | null
+  date: string | null
   startTime: Date | null
   endTime: Date | null
   notes: string | null
@@ -52,6 +54,7 @@ export type PersonOnCallCountAggregateOutputType = {
   id: number
   personId: number
   room: number
+  date: number
   startTime: number
   endTime: number
   notes: number
@@ -66,6 +69,7 @@ export type PersonOnCallMinAggregateInputType = {
   id?: true
   personId?: true
   room?: true
+  date?: true
   startTime?: true
   endTime?: true
   notes?: true
@@ -78,6 +82,7 @@ export type PersonOnCallMaxAggregateInputType = {
   id?: true
   personId?: true
   room?: true
+  date?: true
   startTime?: true
   endTime?: true
   notes?: true
@@ -90,6 +95,7 @@ export type PersonOnCallCountAggregateInputType = {
   id?: true
   personId?: true
   room?: true
+  date?: true
   startTime?: true
   endTime?: true
   notes?: true
@@ -175,6 +181,7 @@ export type PersonOnCallGroupByOutputType = {
   id: string
   personId: string
   room: string
+  date: string
   startTime: Date
   endTime: Date
   notes: string | null
@@ -208,6 +215,7 @@ export type PersonOnCallWhereInput = {
   id?: Prisma.StringFilter<"PersonOnCall"> | string
   personId?: Prisma.StringFilter<"PersonOnCall"> | string
   room?: Prisma.StringFilter<"PersonOnCall"> | string
+  date?: Prisma.StringFilter<"PersonOnCall"> | string
   startTime?: Prisma.DateTimeFilter<"PersonOnCall"> | Date | string
   endTime?: Prisma.DateTimeFilter<"PersonOnCall"> | Date | string
   notes?: Prisma.StringNullableFilter<"PersonOnCall"> | string | null
@@ -222,6 +230,7 @@ export type PersonOnCallOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   personId?: Prisma.SortOrder
   room?: Prisma.SortOrder
+  date?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -234,11 +243,13 @@ export type PersonOnCallOrderByWithRelationInput = {
 
 export type PersonOnCallWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  personId_room_date?: Prisma.PersonOnCallPersonIdRoomDateCompoundUniqueInput
   AND?: Prisma.PersonOnCallWhereInput | Prisma.PersonOnCallWhereInput[]
   OR?: Prisma.PersonOnCallWhereInput[]
   NOT?: Prisma.PersonOnCallWhereInput | Prisma.PersonOnCallWhereInput[]
   personId?: Prisma.StringFilter<"PersonOnCall"> | string
   room?: Prisma.StringFilter<"PersonOnCall"> | string
+  date?: Prisma.StringFilter<"PersonOnCall"> | string
   startTime?: Prisma.DateTimeFilter<"PersonOnCall"> | Date | string
   endTime?: Prisma.DateTimeFilter<"PersonOnCall"> | Date | string
   notes?: Prisma.StringNullableFilter<"PersonOnCall"> | string | null
@@ -247,12 +258,13 @@ export type PersonOnCallWhereUniqueInput = Prisma.AtLeast<{
   createdById?: Prisma.StringFilter<"PersonOnCall"> | string
   person?: Prisma.XOR<Prisma.PersonScalarRelationFilter, Prisma.PersonWhereInput>
   createdBy?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-}, "id">
+}, "id" | "personId_room_date">
 
 export type PersonOnCallOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   personId?: Prisma.SortOrder
   room?: Prisma.SortOrder
+  date?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -271,6 +283,7 @@ export type PersonOnCallScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"PersonOnCall"> | string
   personId?: Prisma.StringWithAggregatesFilter<"PersonOnCall"> | string
   room?: Prisma.StringWithAggregatesFilter<"PersonOnCall"> | string
+  date?: Prisma.StringWithAggregatesFilter<"PersonOnCall"> | string
   startTime?: Prisma.DateTimeWithAggregatesFilter<"PersonOnCall"> | Date | string
   endTime?: Prisma.DateTimeWithAggregatesFilter<"PersonOnCall"> | Date | string
   notes?: Prisma.StringNullableWithAggregatesFilter<"PersonOnCall"> | string | null
@@ -282,6 +295,7 @@ export type PersonOnCallScalarWhereWithAggregatesInput = {
 export type PersonOnCallCreateInput = {
   id?: string
   room: string
+  date: string
   startTime: Date | string
   endTime: Date | string
   notes?: string | null
@@ -295,6 +309,7 @@ export type PersonOnCallUncheckedCreateInput = {
   id?: string
   personId: string
   room: string
+  date: string
   startTime: Date | string
   endTime: Date | string
   notes?: string | null
@@ -306,6 +321,7 @@ export type PersonOnCallUncheckedCreateInput = {
 export type PersonOnCallUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   room?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.StringFieldUpdateOperationsInput | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -319,6 +335,7 @@ export type PersonOnCallUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   personId?: Prisma.StringFieldUpdateOperationsInput | string
   room?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.StringFieldUpdateOperationsInput | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -331,6 +348,7 @@ export type PersonOnCallCreateManyInput = {
   id?: string
   personId: string
   room: string
+  date: string
   startTime: Date | string
   endTime: Date | string
   notes?: string | null
@@ -342,6 +360,7 @@ export type PersonOnCallCreateManyInput = {
 export type PersonOnCallUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   room?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.StringFieldUpdateOperationsInput | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -353,6 +372,7 @@ export type PersonOnCallUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   personId?: Prisma.StringFieldUpdateOperationsInput | string
   room?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.StringFieldUpdateOperationsInput | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -371,10 +391,17 @@ export type PersonOnCallOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type PersonOnCallPersonIdRoomDateCompoundUniqueInput = {
+  personId: string
+  room: string
+  date: string
+}
+
 export type PersonOnCallCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   personId?: Prisma.SortOrder
   room?: Prisma.SortOrder
+  date?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   notes?: Prisma.SortOrder
@@ -387,6 +414,7 @@ export type PersonOnCallMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   personId?: Prisma.SortOrder
   room?: Prisma.SortOrder
+  date?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   notes?: Prisma.SortOrder
@@ -399,6 +427,7 @@ export type PersonOnCallMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   personId?: Prisma.SortOrder
   room?: Prisma.SortOrder
+  date?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
   notes?: Prisma.SortOrder
@@ -494,6 +523,7 @@ export type PersonOnCallUncheckedUpdateManyWithoutPersonNestedInput = {
 export type PersonOnCallCreateWithoutCreatedByInput = {
   id?: string
   room: string
+  date: string
   startTime: Date | string
   endTime: Date | string
   notes?: string | null
@@ -506,6 +536,7 @@ export type PersonOnCallUncheckedCreateWithoutCreatedByInput = {
   id?: string
   personId: string
   room: string
+  date: string
   startTime: Date | string
   endTime: Date | string
   notes?: string | null
@@ -546,6 +577,7 @@ export type PersonOnCallScalarWhereInput = {
   id?: Prisma.StringFilter<"PersonOnCall"> | string
   personId?: Prisma.StringFilter<"PersonOnCall"> | string
   room?: Prisma.StringFilter<"PersonOnCall"> | string
+  date?: Prisma.StringFilter<"PersonOnCall"> | string
   startTime?: Prisma.DateTimeFilter<"PersonOnCall"> | Date | string
   endTime?: Prisma.DateTimeFilter<"PersonOnCall"> | Date | string
   notes?: Prisma.StringNullableFilter<"PersonOnCall"> | string | null
@@ -557,6 +589,7 @@ export type PersonOnCallScalarWhereInput = {
 export type PersonOnCallCreateWithoutPersonInput = {
   id?: string
   room: string
+  date: string
   startTime: Date | string
   endTime: Date | string
   notes?: string | null
@@ -568,6 +601,7 @@ export type PersonOnCallCreateWithoutPersonInput = {
 export type PersonOnCallUncheckedCreateWithoutPersonInput = {
   id?: string
   room: string
+  date: string
   startTime: Date | string
   endTime: Date | string
   notes?: string | null
@@ -606,6 +640,7 @@ export type PersonOnCallCreateManyCreatedByInput = {
   id?: string
   personId: string
   room: string
+  date: string
   startTime: Date | string
   endTime: Date | string
   notes?: string | null
@@ -616,6 +651,7 @@ export type PersonOnCallCreateManyCreatedByInput = {
 export type PersonOnCallUpdateWithoutCreatedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   room?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.StringFieldUpdateOperationsInput | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -628,6 +664,7 @@ export type PersonOnCallUncheckedUpdateWithoutCreatedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   personId?: Prisma.StringFieldUpdateOperationsInput | string
   room?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.StringFieldUpdateOperationsInput | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -639,6 +676,7 @@ export type PersonOnCallUncheckedUpdateManyWithoutCreatedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   personId?: Prisma.StringFieldUpdateOperationsInput | string
   room?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.StringFieldUpdateOperationsInput | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -649,6 +687,7 @@ export type PersonOnCallUncheckedUpdateManyWithoutCreatedByInput = {
 export type PersonOnCallCreateManyPersonInput = {
   id?: string
   room: string
+  date: string
   startTime: Date | string
   endTime: Date | string
   notes?: string | null
@@ -660,6 +699,7 @@ export type PersonOnCallCreateManyPersonInput = {
 export type PersonOnCallUpdateWithoutPersonInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   room?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.StringFieldUpdateOperationsInput | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -671,6 +711,7 @@ export type PersonOnCallUpdateWithoutPersonInput = {
 export type PersonOnCallUncheckedUpdateWithoutPersonInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   room?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.StringFieldUpdateOperationsInput | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -682,6 +723,7 @@ export type PersonOnCallUncheckedUpdateWithoutPersonInput = {
 export type PersonOnCallUncheckedUpdateManyWithoutPersonInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   room?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.StringFieldUpdateOperationsInput | string
   startTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endTime?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -696,6 +738,7 @@ export type PersonOnCallSelect<ExtArgs extends runtime.Types.Extensions.Internal
   id?: boolean
   personId?: boolean
   room?: boolean
+  date?: boolean
   startTime?: boolean
   endTime?: boolean
   notes?: boolean
@@ -710,6 +753,7 @@ export type PersonOnCallSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   id?: boolean
   personId?: boolean
   room?: boolean
+  date?: boolean
   startTime?: boolean
   endTime?: boolean
   notes?: boolean
@@ -724,6 +768,7 @@ export type PersonOnCallSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   id?: boolean
   personId?: boolean
   room?: boolean
+  date?: boolean
   startTime?: boolean
   endTime?: boolean
   notes?: boolean
@@ -738,6 +783,7 @@ export type PersonOnCallSelectScalar = {
   id?: boolean
   personId?: boolean
   room?: boolean
+  date?: boolean
   startTime?: boolean
   endTime?: boolean
   notes?: boolean
@@ -746,7 +792,7 @@ export type PersonOnCallSelectScalar = {
   createdById?: boolean
 }
 
-export type PersonOnCallOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "personId" | "room" | "startTime" | "endTime" | "notes" | "createdAt" | "updatedAt" | "createdById", ExtArgs["result"]["personOnCall"]>
+export type PersonOnCallOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "personId" | "room" | "date" | "startTime" | "endTime" | "notes" | "createdAt" | "updatedAt" | "createdById", ExtArgs["result"]["personOnCall"]>
 export type PersonOnCallInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   person?: boolean | Prisma.PersonDefaultArgs<ExtArgs>
   createdBy?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -770,6 +816,7 @@ export type $PersonOnCallPayload<ExtArgs extends runtime.Types.Extensions.Intern
     id: string
     personId: string
     room: string
+    date: string
     startTime: Date
     endTime: Date
     notes: string | null
@@ -1204,6 +1251,7 @@ export interface PersonOnCallFieldRefs {
   readonly id: Prisma.FieldRef<"PersonOnCall", 'String'>
   readonly personId: Prisma.FieldRef<"PersonOnCall", 'String'>
   readonly room: Prisma.FieldRef<"PersonOnCall", 'String'>
+  readonly date: Prisma.FieldRef<"PersonOnCall", 'String'>
   readonly startTime: Prisma.FieldRef<"PersonOnCall", 'DateTime'>
   readonly endTime: Prisma.FieldRef<"PersonOnCall", 'DateTime'>
   readonly notes: Prisma.FieldRef<"PersonOnCall", 'String'>

@@ -1,4 +1,4 @@
-import { getCategoryColor } from "../oncall-function";
+import { getCategoryColor } from "./get-color";
 import { toLocalDateStr } from "../local-date-string";
 import { format } from "date-fns";
 import { enUS as localeId } from "date-fns/locale";
@@ -24,20 +24,26 @@ export function buildDayGrid(weekStart: string, entries: PersonOnCall[]) {
     const dayEntries = entries.filter(
       (oc) => toLocalDateStr(oc.startTime) === dayStr,
     );
-    const byCategory = dayEntries.reduce(
+    const byRoom = dayEntries.reduce(
       (acc, oc) => {
-        const cat = oc.person.category.name;
-        if (!acc[cat]) acc[cat] = [];
-        acc[cat].push(oc);
+        const room = oc.room;
+        if (!acc[room]) acc[room] = [];
+        acc[room].push(oc);
         return acc;
       },
       {} as Record<string, PersonOnCall[]>,
     );
-    return { day, dayStr, byCategory, total: dayEntries.length };
+    return { day, dayStr, byRoom, total: dayEntries.length };
   });
 }
 
-export function WeekGrid({ week, search }: { week: WeekResponse; search: string }) {
+export function WeekGrid({
+  week,
+  search,
+}: {
+  week: WeekResponse;
+  search: string;
+}) {
   const days = buildDayGrid(week.weekStart, week.data);
   const today = toLocalDateStr(new Date().toISOString());
   const weekLabel = `${format(new Date(week.weekStart), "d MMM", { locale: localeId })} – ${format(new Date(week.weekEnd), "d MMM yyyy", { locale: localeId })}`;
@@ -53,16 +59,18 @@ export function WeekGrid({ week, search }: { week: WeekResponse; search: string 
         </span>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
-        {days.map(({ day, dayStr, byCategory, total }, i) => {
+        {days.map(({ day, dayStr, byRoom, total }, i) => {
           const isToday = dayStr === today;
-          const categories = Object.entries(byCategory).sort(([a], [b]) =>
+          const rooms = Object.entries(byRoom).sort(([a], [b]) =>
             a.localeCompare(b),
           );
           return (
             <div
               key={dayStr}
               className={`rounded-xl border flex flex-col overflow-hidden ${
-                isToday ? "border-primary ring-1 ring-primary" : "border-border"
+                isToday
+                  ? "border-primary ring-1 ring-primary"
+                  : "border-border"
               }`}
             >
               <div
@@ -91,26 +99,35 @@ export function WeekGrid({ week, search }: { week: WeekResponse; search: string 
                 )}
               </div>
               <div className="flex flex-col gap-1.5 p-2 flex-1 min-h-[80px]">
-                {categories.length === 0 ? (
+                {rooms.length === 0 ? (
                   <p className="text-[11px] text-muted-foreground text-center py-3">
                     {search ? "No results found" : "No schedule"}
                   </p>
                 ) : (
-                  categories.map(([catName, persons]) => {
-                    const color = getCategoryColor(catName);
+                  rooms.map(([roomName, persons]) => {
+                    const color = getCategoryColor(roomName);
                     return (
                       <div
-                        key={catName}
+                        key={roomName}
                         className="rounded-md border px-2 py-1"
-                        style={{ backgroundColor: color.bg, borderColor: color.border, color: color.text }}
+                        style={{
+                          backgroundColor: color.bg,
+                          borderColor: color.border,
+                          color: color.text,
+                        }}
                       >
                         <p className="text-[9px] font-bold uppercase tracking-wide opacity-60 leading-none mb-0.5">
-                          {catName}
+                          {roomName}
                         </p>
                         {persons.map((oc) => (
                           <p
                             key={oc.id}
-                            className="text-[11px] font-medium leading-snug"
+                            className="text-[11px] font-medium leading-snug line-clamp-2 min-h-[2.2rem]"
+                            title={
+                              oc.person.name !== oc.person.code
+                                ? oc.person.name
+                                : oc.person.code
+                            }
                           >
                             {oc.person.name !== oc.person.code
                               ? oc.person.name

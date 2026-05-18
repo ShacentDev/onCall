@@ -16,27 +16,25 @@ export async function POST(request: NextRequest) {
   try {
     const session = await requireAdmin();
 
-    const { toCreate } = (await request.json()) as { toCreate: OnCallEntry[] };
+    const { toCreate } = (await request.json()) as {
+      toCreate: OnCallEntry[];
+    };
 
     if (!toCreate || toCreate.length === 0) {
       return NextResponse.json(
-        { message: "Tidak ada data untuk diimpor." },
+        { message: "Tidak ada data untuk diimport." },
         { status: 400 },
       );
     }
 
-    // ── 1. Deduplicate input (same doctor, same room, same day) ──────────────
-    // Guards against duplicate rows within the payload itself, in addition to
-    // the dedup already done in the upload/parse step.
-    const seenKeys = new Set<string>();
+    const seen = new Set<string>();
     const deduplicatedEntries = toCreate.filter((item) => {
       const key = `${item.personCode}|${item.date}|${item.specialization}`;
-      if (seenKeys.has(key)) return false;
-      seenKeys.add(key);
+      if (seen.has(key)) return false;
+      seen.add(key);
       return true;
     });
 
-    // ── 2. Resolve / create categories ───────────────────────────────────────
     const uniqueSpecializations = [
       ...new Set(deduplicatedEntries.map((i) => i.specialization)),
     ];
@@ -60,7 +58,6 @@ export async function POST(request: NextRequest) {
         data: missingCategories.map((name) => ({ name })),
         skipDuplicates: true,
       });
-
       const newCategories = await prisma.category.findMany({
         where: { name: { in: missingCategories } },
       });
@@ -69,55 +66,45 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // ── 3. Resolve / create persons ──────────────────────────────────────────
     const existingPersons = await prisma.person.findMany({
       where: { code: { in: uniqueCodes } },
     });
-    const personByCode = new Map(existingPersons.map((p) => [p.code, p.id]));
+    const personByCode = new Map(existingPersons.map((p) => [p.code, p]));
 
-    // For each unknown code, record the first specialization encountered so the
-    // new person gets a sensible default category.
-    const missingPersonEntries = deduplicatedEntries
-      .filter((item) => !personByCode.has(item.personCode))
-      .reduce(
-        (acc, item) => {
-          if (!acc.has(item.personCode)) {
-            acc.set(item.personCode, {
-              code: item.personCode,
-              categoryName: item.specialization,
-            });
-          }
-          return acc;
-        },
-        new Map<string, { code: string; categoryName: string }>(),
-      );
+    const missingPersonCodes = uniqueCodes.filter(
+      (code) => !personByCode.has(code),
+    );
 
-    if (missingPersonEntries.size > 0) {
+    if (missingPersonCodes.length > 0) {
+      const newPersonData = missingPersonCodes.map((code) => {
+        const entry = deduplicatedEntries.find((e) => e.personCode === code)!;
+        return {
+          name: code,
+          code,
+          categoryId: categoryByName.get(entry.specialization)!,
+        };
+      });
+
       await prisma.person.createMany({
-        data: Array.from(missingPersonEntries.values()).map(
-          ({ code, categoryName }) => ({
-            name: code,
-            code,
-            categoryId: categoryByName.get(categoryName)!,
-          }),
-        ),
+        data: newPersonData,
         skipDuplicates: true,
       });
 
       const newPersons = await prisma.person.findMany({
-        where: { code: { in: Array.from(missingPersonEntries.keys()) } },
+        where: { code: { in: missingPersonCodes } },
       });
       for (const p of newPersons) {
-        personByCode.set(p.code, p.id);
+        personByCode.set(p.code, p);
       }
     }
-    
-    const minTime = deduplicatedEntries.reduce((min, r) => {
-      const t = new Date(r.startTime).getTime();
+
+    const minTime = deduplicatedEntries.reduce((min, item) => {
+      const t = new Date(item.startTime).getTime();
       return t < min ? t : min;
     }, Infinity);
-    const maxTime = deduplicatedEntries.reduce((max, r) => {
-      const t = new Date(r.endTime).getTime();
+
+    const maxTime = deduplicatedEntries.reduce((max, item) => {
+      const t = new Date(item.endTime).getTime();
       return t > max ? t : max;
     }, -Infinity);
 
@@ -128,58 +115,34 @@ export async function POST(request: NextRequest) {
       include: { person: true },
     });
 
-    const existingDbKeys = new Set(
-      existingOnCalls.map(
-        (oc) =>
-          `${oc.person.code}|${oc.startTime.toISOString().split("T")[0]}|${oc.room}`,
-      ),
+    const existingKeys = new Set(
+      existingOnCalls.map((oc) => `${oc.person.code}|${oc.date}|${oc.room}`),
     );
 
     const finalEntries = deduplicatedEntries.filter(
       (item) =>
-        !existingDbKeys.has(
+        !existingKeys.has(
           `${item.personCode}|${item.date}|${item.specialization}`,
         ),
     );
 
-    if (finalEntries.length === 0) {
-      return NextResponse.json({
-        message:
-          "Semua data sudah ada di database (tidak ada jadwal baru yang ditambahkan).",
-        inserted: 0,
+    if (finalEntries.length > 0) {
+      await prisma.personOnCall.createMany({
+        data: finalEntries.map((item) => ({
+          personId: personByCode.get(item.personCode)!.id,
+          room: item.specialization,
+          date: item.date,
+          startTime: new Date(item.startTime),
+          endTime: new Date(item.endTime),
+          createdById: session.user.id,
+        })),
+        skipDuplicates: true,
       });
     }
 
-    await prisma.personOnCall.createMany({
-      data: finalEntries.map((item) => ({
-        personId: personByCode.get(item.personCode)!,
-        room: item.specialization,
-        startTime: new Date(item.startTime),
-        endTime: new Date(item.endTime),
-        createdById: session.user.id,
-      })),
-      skipDuplicates: true, 
-    });
-
-    const skippedCount = deduplicatedEntries.length - finalEntries.length;
-    const newCategoriesCount = missingCategories.length;
-    const newPersonsCount = missingPersonEntries.size;
-
     return NextResponse.json({
-      message: [
-        `Import berhasil. ${finalEntries.length} jadwal ditambahkan.`,
-        skippedCount > 0
-          ? `${skippedCount} jadwal dilewati karena sudah ada.`
-          : "",
-        newPersonsCount > 0 ? `${newPersonsCount} person baru dibuat.` : "",
-        newCategoriesCount > 0
-          ? `${newCategoriesCount} kategori baru dibuat.`
-          : "",
-      ]
-        .filter(Boolean)
-        .join(" "),
+      message: `Import berhasil. ${finalEntries.length} jadwal ditambahkan.`,
       inserted: finalEntries.length,
-      skipped: skippedCount,
     });
   } catch (err) {
     return handleApiError(err);
