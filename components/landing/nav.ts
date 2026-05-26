@@ -1,6 +1,7 @@
 import {
   CalendarClock,
   Network,
+  QrCode,
   type LucideIcon,
 } from "lucide-react";
 
@@ -26,6 +27,13 @@ export const NAV_ITEMS: NavItem[] = [
     description: "Real-time connectivity status for all network switches.",
     href: "/network",
     icon: Network,
+    status: "new",
+  },
+  {
+    title: "QR Code Generator",
+    description: "Generate QR codes for URLs, text, and other information.",
+    href: "/qrcode",
+    icon: QrCode,
     status: "new",
   },
 ];
